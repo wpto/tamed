@@ -2,20 +2,20 @@ package service
 
 import "github.com/pgeowng/tamed/store"
 
-type MediaContentServiceImpl struct {
+type MediaContentSrv struct {
 	store *store.Store
 }
 
-func (srv *MediaContentServiceImpl) Upload() error {
+func (srv *MediaContentSrv) Upload() error {
 	return nil
 }
 
-func (srv *MediaContentServiceImpl) Download() error {
+func (srv *MediaContentSrv) Download() error {
 	return nil
 }
 
-func NewMediaContentServiceImpl(store *store.Store) *MediaContentServiceImpl {
-	return &MediaContentServiceImpl{
+func NewMediaContentSrv(store *store.Store) *	MediaContentSrv {
+	return &MediaContentSrv{
 		store: store,
 	}
 }

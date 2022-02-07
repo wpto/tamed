@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store"
 )
 
@@ -11,8 +12,13 @@ type MediaContentService interface {
 	Download() error
 }
 
+type MediaMetaService interface {
+	Get(string) (*model.MediaMeta, error)
+}
+
 type Manager struct {
 	MediaContent MediaContentService
+	MediaMeta    MediaMetaService
 }
 
 func NewManager(store *store.Store) (*Manager, error) {
@@ -20,7 +26,8 @@ func NewManager(store *store.Store) (*Manager, error) {
 		return nil, fmt.Errorf("no store provided")
 	} else {
 		return &Manager{
-			MediaContent: NewMediaContentService(store),
+			MediaContent: NewMediaContentSrv(store),
+			MediaMeta:    NewMediaMetaSrv(store),
 		}, nil
 	}
 }

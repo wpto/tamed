@@ -22,7 +22,7 @@ func NewMediaMetaSrv(store *store.Store) *MediaMetaSrv {
 func (srv *MediaMetaSrv) Get(mediaID string) (meta *model.MediaMeta, err error) {
 	meta, err = srv.store.MediaMeta.GetMeta(mediaID)
 	if err != nil {
-		return nil, errors.Wrap(err, "srv.file.getmeta")
+		return nil, errors.Wrap(err, "srv.mediameta.get")
 	}
 	if meta == nil {
 		return nil, errors.Wrap(types.ErrNotFound, fmt.Sprintf("Media '%s' not found!", mediaID))

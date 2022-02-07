@@ -7,39 +7,48 @@ import (
 	"path/filepath"
 
 	"github.com/pgeowng/tamed/model"
+	"github.com/pgeowng/tamed/types"
 	"github.com/pkg/errors"
 )
 
-type FileMetaFSLocalRepo struct {
+type MediaMetaRepo struct {
 	localPath string
 }
 
-func NewMediaMetaRepo(localPath string) *FileMetaFSLocalRepo {
-	return &FileMetaFSLocalRepo{localPath: localPath}
+func NewMediaMetaRepo(localPath string) *MediaMetaRepo {
+	return &MediaMetaRepo{localPath: localPath}
 }
 
-func (rep *FileMetaFSLocalRepo) GetMeta(mediaID string) (meta *model.MediaMeta, err error) {
-
-	dpath := filepath.Join(rep.localPath, mediaID)
-
-	if _, err = os.Stat(dpath); os.IsNotExist(err) {
-		return nil, nil
+func TryFileMeta(dirPath string) (*FileMeta, error) {
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		return nil, errors.Wrap(types.ErrNotFound, "fslocal.tryfilemeta")
 	}
 
-	mpath := filepath.Join(dpath, "meta.json")
-
-	metaFile, err := ioutil.ReadFile(mpath)
+	metaPath := filepath.Join(dirPath, "meta.json")
+	f, err := ioutil.ReadFile(metaPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "fs.meta file read error")
+		return nil, errors.Wrap(err, "fslocal.tryfilemeta filemeta read error")
 	}
 
-	metaJSON := MetaFile{}
-	err = json.Unmarshal(metaFile, &metaJSON)
+	fileMeta := &FileMeta{}
+	err = json.Unmarshal(f, fileMeta)
 	if err != nil {
-		return nil, errors.Wrap(err, "fs.meta file unmarshal error")
+		return nil, errors.Wrap(err, "fslocal.tryfilemeta filemeta unmarshal error")
 	}
 
-	return metaJSON.ToMediaMeta(), nil
+	return fileMeta, nil
+}
+
+func (rep *MediaMetaRepo) GetMeta(mediaID string) (*model.MediaMeta, error) {
+
+	dirPath := filepath.Join(rep.localPath, mediaID)
+
+	fileMeta, err := TryFileMeta(dirPath)
+	if err != nil {
+		return nil, errors.Wrap(err, "fslocal.getmeta")
+	}
+
+	return fileMeta.ToMediaMeta(), nil
 }
 
 // func DetectType(formatName string) string {
@@ -75,7 +84,7 @@ func (rep *FileMetaFSLocalRepo) GetMeta(mediaID string) (meta *model.MediaMeta, 
 // 	return contentType, nil
 // }
 
-type MetaFile struct {
+type FileMeta struct {
 	Mime      string `json:"mime"`
 	MediaType string `json:"mediaType"`
 	Width     int    `json:"width"`
@@ -84,7 +93,7 @@ type MetaFile struct {
 	ID        string `json:"id"`
 }
 
-func (mf *MetaFile) ToMediaMeta() *model.MediaMeta {
+func (mf *FileMeta) ToMediaMeta() *model.MediaMeta {
 	return &model.MediaMeta{
 		ID:     mf.ID,
 		Type:   mf.MediaType,

@@ -10,8 +10,13 @@ type MediaMetaRepo interface {
 	GetMeta(string) (*model.MediaMeta, error)
 }
 
+type MediaContentRepo interface {
+	GetContent(mediaID string, contentType string, width, height int) ([]byte, error)
+}
+
 type Store struct {
 	MediaMeta MediaMetaRepo
+	MediaContent MediaContentRepo
 }
 
 func New() (*Store, error) {
@@ -21,6 +26,7 @@ func New() (*Store, error) {
 
 	if cfg.LocalPath != "" {
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
+		store.MediaContent = fslocal.NewMediaContentRepo(cfg.LocalPath)
 	}
 
 	return &store, nil

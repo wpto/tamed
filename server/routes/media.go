@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pgeowng/tamed/service"
@@ -21,14 +22,14 @@ func NewMediaRoute(services *service.Manager) *MediaRoute {
 }
 
 func (r *MediaRoute) Get(c *gin.Context) {
-	fileId := c.Param("id")
+	fileID := c.Param("id")
 
-	if len(fileId) < 1 {
+	if len(fileID) < 1 {
 		c.JSON(http.StatusBadRequest, "empty file id")
 		return
 	}
 
-	mediaMeta, err := r.services.MediaMeta.Get(fileId)
+	mediaMeta, err := r.services.MediaMeta.Get(fileID)
 
 	if err != nil {
 		SendError(c, err)
@@ -39,12 +40,18 @@ func (r *MediaRoute) Get(c *gin.Context) {
 }
 
 func (r *MediaRoute) Download(c *gin.Context) {
-	fileId := c.Param("id")
+	fileID := c.Param("id")
 	sizeVal := c.Query("size")
 	formatVal := c.Query("format")
 
-	if len(fileId) < 1 {
+	if len(fileID) < 1 {
 		c.JSON(http.StatusBadRequest, "empty file id")
+		return
+	}
+
+	contentType, err := types.GetMime(formatVal)
+	if err != nil {
+		SendError(c, err)
 		return
 	}
 
@@ -52,17 +59,18 @@ func (r *MediaRoute) Download(c *gin.Context) {
 	if err != nil {
 		width, height = 1200, 1200
 		// SendError(c, err)
-	}	
+	}
 
-	if formatVal == "jpg" {
+	mediaContent, err := r.services.MediaContent.Download(fileID, contentType, width, height)
 
-
+	if err != nil {
+		SendError(c, err)
 		return
 	}
 
+	c.Data(http.StatusOK, contentType, mediaContent)
+		return
 
-	c.JSON(http.StatusBadRequest, errors.Wrap(types.ErrBadRequest("bad format")))
-	return
 }
 
 func ParseSize(val string) (width, height int, err error) {
@@ -72,31 +80,40 @@ func ParseSize(val string) (width, height int, err error) {
 		return
 	}
 
-	width, err = strconv.ParseInt(tokens[0], 10, 0)
+	num, err := strconv.ParseInt(tokens[0], 10, 0)
 	if err != nil {
 		err = errors.Wrap(types.ErrBadRequest, "bad width")
 		return
 	}
 
-	height, err = strconv.ParseInt(tokens[1], 10, 0)
+	width = int(num)
+
+	num, err = strconv.ParseInt(tokens[1], 10, 0)
 	if err != nil {
 		err = errors.Wrap(types.ErrBadRequest, "bad height")
 		return
 	}
+
+	height = int(num)
 
 	return
 }
 
 func SendError(c *gin.Context, err error) {
 	if err != nil {
+		var status int
 		switch {
 		case errors.Cause(err) == types.ErrNotFound:
-			c.JSON(http.StatusNotFound, err)
+			status = http.StatusNotFound
 		case errors.Cause(err) == types.ErrBadRequest:
-			c.JSON(http.StatusBadRequest, err)
+			status = http.StatusBadRequest
+		case errors.Cause(err) == types.ErrNotImplemented:
+			status = http.StatusNotImplemented
 		default:
-			c.JSON(http.StatusInternalServerError, err)
+			status = http.StatusInternalServerError
 		}
+
+		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
 }

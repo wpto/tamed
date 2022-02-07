@@ -1,20 +1,25 @@
 package service
 
-import "github.com/pgeowng/tamed/store"
+import (
+	"github.com/pgeowng/tamed/store"
+	"github.com/pkg/errors"
+)
 
 type MediaContentSrv struct {
 	store *store.Store
 }
 
-func (srv *MediaContentSrv) Upload() error {
-	return nil
+func (srv *MediaContentSrv) Download(mediaID string, contentType string, width int, height int) (data []byte, err error) {
+	data, err = srv.store.MediaContent.GetContent(mediaID, contentType, width, height)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.mediacontent.download")
+	}
+
+	return
 }
 
-func (srv *MediaContentSrv) Download() error {
-	return nil
-}
-
-func NewMediaContentSrv(store *store.Store) *	MediaContentSrv {
+func NewMediaContentSrv(store *store.Store) *MediaContentSrv {
 	return &MediaContentSrv{
 		store: store,
 	}

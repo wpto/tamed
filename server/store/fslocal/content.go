@@ -3,6 +3,7 @@ package fslocal
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"path/filepath"
 
 	"github.com/h2non/bimg"
@@ -73,7 +74,7 @@ func ConvImgToImg(origPath string, cachePath string, targetExt string, width, he
 		fmt.Printf("converting from %s to %s", img.Type(), targetExt)
 		buf, err = img.Convert(ExtToBimg[targetExt])
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("fslocal.content.convimgtoimg: from %s to %s", img.Type(), targetExt	))
+			return nil, errors.Wrap(err, fmt.Sprintf("fslocal.content.convimgtoimg: from %s to %s", img.Type(), targetExt))
 		}
 
 		img = bimg.NewImage(buf)
@@ -84,9 +85,18 @@ func ConvImgToImg(origPath string, cachePath string, targetExt string, width, he
 		return nil, errors.Wrap(err, "fslocal.content.convimgtoimg")
 	}
 
-	if width < size.Width && height < size.Height {
-		// do proper fit in size with rounding to lower val
-		buf, err = img.ResizeAndCrop(width, height)
+	if width < size.Width || height < size.Height {
+		coef := float64(width) / float64(size.Width)
+		coefH := float64(height) / float64(size.Height)
+
+		if coefH < coef {
+			coef = coefH
+		}
+
+		newWidth := int(math.Floor(float64(size.Width) * coef))
+		newHeight := int(math.Floor(float64(size.Height) * coef))
+
+		buf, err = img.ResizeAndCrop(newWidth, newHeight)
 		if err != nil {
 			return nil, errors.Wrap(err, "fslocal.content.convimgtoimg")
 		}

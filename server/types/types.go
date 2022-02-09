@@ -43,3 +43,33 @@ func GetExt(mime string) (string, error) {
 	}
 	return ext, nil
 }
+
+var MimeToMediaType = map[string]string{
+	"image/jpeg": "pic",
+	"image/gif":  "pic",
+	"image/png":  "pic",
+	"image/webp": "pic",
+	"video/mp4":  "vid",
+}
+
+func GetMediaType(mime string) (string, error) {
+	ext, ok := MimeToMediaType[mime]
+	if !ok {
+		return "", errors.Wrap(ErrBadRequest, fmt.Sprintf("mediatype: bad mime(%s)", mime))
+	}
+	return ext, nil
+}
+
+// probably bad place??
+type GetVidOpts struct {
+	MediaID string
+	ContentType string
+	Width int
+	Audio bool
+}
+
+type GetPicOpts struct {
+	MediaID string
+	ContentType string
+	Width int
+}

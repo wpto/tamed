@@ -84,20 +84,3 @@ func (rep *MediaMetaRepo) GetMeta(mediaID string) (*model.MediaMeta, error) {
 // 	return contentType, nil
 // }
 
-type FileMeta struct {
-	Mime      string `json:"mime"`
-	MediaType string `json:"mediaType"`
-	Width     int    `json:"width"`
-	Height    int    `json:"height"`
-	Filename  string `json:"filename"`
-	ID        string `json:"id"`
-}
-
-func (mf *FileMeta) ToMediaMeta() *model.MediaMeta {
-	return &model.MediaMeta{
-		ID:     mf.ID,
-		Type:   mf.MediaType,
-		Width:  mf.Width,
-		Height: mf.Height,
-	}
-}

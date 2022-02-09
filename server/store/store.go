@@ -4,19 +4,25 @@ import (
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store/fslocal"
+	"github.com/pgeowng/tamed/types"
 )
 
 type MediaMetaRepo interface {
 	GetMeta(string) (*model.MediaMeta, error)
 }
 
-type MediaContentRepo interface {
-	GetContent(mediaID string, contentType string, width, height int) ([]byte, error)
+type MediaPicRepo interface {
+	GetContent(*types.GetPicOpts) ([]byte, error)
+}
+
+type MediaVidRepo interface {
+	GetContent(*types.GetVidOpts) ([]byte, error)
 }
 
 type Store struct {
 	MediaMeta MediaMetaRepo
-	MediaContent MediaContentRepo
+	MediaPic  MediaPicRepo
+	MediaVid  MediaVidRepo
 }
 
 func New() (*Store, error) {
@@ -26,7 +32,8 @@ func New() (*Store, error) {
 
 	if cfg.LocalPath != "" {
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
-		store.MediaContent = fslocal.NewMediaContentRepo(cfg.LocalPath)
+		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
+		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)
 	}
 
 	return &store, nil

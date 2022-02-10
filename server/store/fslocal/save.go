@@ -2,7 +2,6 @@ package fslocal
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -32,7 +31,8 @@ func (rep *MediaContentRepo) Save(contentType string, upload io.Reader) error {
 		return errors.Wrap(err, "fslocal.mediacontent.save")
 	}
 
-	origFileName := fmt.Sprintf("%s.%s", mediaID, types.MimeToExt[contentType])
+	// origFileName := fmt.Sprintf("%s.%s", mediaID, types.MimeToExt[contentType])
+	origFileName := mediaID
 	origPath := filepath.Join(dirPath, origFileName)
 	err = WriteMedia(origPath, upload)
 	if err != nil {

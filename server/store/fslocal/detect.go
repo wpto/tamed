@@ -39,14 +39,14 @@ func PicInfo(origPath string, info *MediaInfo) error {
 }
 
 func VidInfo(origPath string, info *MediaInfo) error {
-	err := probeFFProbe(origPath, info)
+	err := probeMediainfo(origPath, info)
 	if err != nil {
 		return errors.Wrap(err, "vidinfo")
 	}
 	return nil
 }
 
-type FFProbeResult struct {
+type ResultFFProbe struct {
 	Streams []struct {
 		CodecType string `json:"codec_type"`
 		Width     int    `json:"width"`
@@ -69,20 +69,20 @@ func probeFFProbe(filePath string, info *MediaInfo) error {
 	err := ffp.Run()
 	if err != nil {
 		return errors.Wrap(err,
-			fmt.Sprintf("ffprobe dim: %q", errBuf.String()))
+			fmt.Sprintf("probe.ffprobe %q", errBuf.String()))
 	}
 
-	var result FFProbeResult
+	var result ResultFFProbe
 	err = json.Unmarshal(outBuf.Bytes(), &result)
 	if err != nil {
-		return errors.Wrap(err, "ffprobe dim")
+		return errors.Wrap(err, "probe.ffprobe")
 	}
 
 	for _, stream := range result.Streams {
 		if stream.CodecType == "video" {
 			dur, err := strconv.ParseFloat(stream.Duration, 32)
 			if err != nil {
-				return errors.Wrap(err, "ffprobe parse")
+				return errors.Wrap(err, "probe.ffprobe.parse")
 			}
 			info.Width = stream.Width
 			info.Height = stream.Height
@@ -94,7 +94,61 @@ func probeFFProbe(filePath string, info *MediaInfo) error {
 	return errors.New("ffprobe: video stream not found")
 }
 
-// type MediainfoResult struct {
-// }
+type ResultMediainfo struct {
+	Media struct {
+		Track []struct {
+			Type     string `json:"@type"`
+			Duration string
+			Width    string
+			Height   string
+		} `json:"track"`
+	} `json:"media"`
+}
 
-// func probeMediainfo() {}
+func probeMediainfo(filePath string, info *MediaInfo) error {
+	mi := exec.Command("mediainfo", "--Output=JSON", filePath)
+
+	var outBuf bytes.Buffer
+	var errBuf bytes.Buffer
+	mi.Stdout = &outBuf
+	mi.Stderr = &errBuf
+	err := mi.Run()
+	if err != nil {
+		return errors.Wrap(err,
+			fmt.Sprintf("probe.mediainfo: %q", errBuf.String()))
+	}
+
+	var result ResultMediainfo
+	err = json.Unmarshal(outBuf.Bytes(), &result)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("probe.mediainfo(input %q)", outBuf.String()))
+	}
+
+	for _, track := range result.Media.Track {
+		if track.Type == "Video" {
+			fmt.Println(track)
+			duration, err := strconv.ParseFloat(track.Duration, 32)
+			if err != nil {
+				return errors.Wrap(err, "probe.mediainfo.result.track.Duration")
+			}
+
+			width, err := strconv.ParseInt(track.Width, 10, 0)
+			if err != nil {
+				return errors.Wrap(err, "probe.mediainfo.result.track.Width")
+			}
+
+			height, err := strconv.ParseInt(track.Height, 10, 0)
+			if err != nil {
+				return errors.Wrap(err, "probe.mediainfo.result.track.Height")
+			}
+
+			info.Duration = int(math.Ceil(duration))
+			info.Width = int(width)
+			info.Height = int(height)
+
+			return nil
+		}
+	}
+
+	return errors.New("probe.mediainfo.result: parse error")
+}

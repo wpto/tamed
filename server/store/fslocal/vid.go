@@ -42,7 +42,7 @@ func (rep *MediaVidRepo) GetContent(opts *types.GetVidOpts) ([]byte, error) {
 	if opts.Width != 0 && opts.Width < meta.Width {
 		args := []string{
 			"-i", origPath,
-			"-vf", fmt.Sprintf("scale=%d:-1", opts.Width),
+			"-vf", fmt.Sprintf("scale=%d:-2", opts.Width),
 			"-an",
 		}
 

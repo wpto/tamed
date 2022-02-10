@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,13 +11,30 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *MediaRoute) Download(c *gin.Context) {
-	fileID := c.Param("id")
+func (r *MediaRoute) serveMeta(c *gin.Context, mediaID string) {
+	meta, err := r.services.MediaMeta.Get(mediaID)
+	if err != nil {
+		SendError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, meta)
+}
+
+func (r *MediaRoute) Get(c *gin.Context) {
+	mediaID := c.Param("id")
 	sizeVal := c.Query("size")
 	formatVal := c.Query("format")
+	metaVal := c.Query("meta")
+	fmt.Println("metaval", metaVal)
 
-	if len(fileID) < 1 {
+	if len(mediaID) < 1 {
 		c.JSON(http.StatusBadRequest, "empty file id")
+		return
+	}
+
+	if len(metaVal) > 0 {
+		r.serveMeta(c, mediaID)
 		return
 	}
 
@@ -32,7 +50,7 @@ func (r *MediaRoute) Download(c *gin.Context) {
 		// SendError(c, err)
 	}
 
-	mediaContent, err := r.services.MediaContent.Download(fileID, contentType, width, height)
+	mediaContent, err := r.services.MediaContent.Download(mediaID, contentType, width, height)
 
 	if err != nil {
 		SendError(c, err)

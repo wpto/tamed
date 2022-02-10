@@ -32,8 +32,7 @@ func run() error {
 	router := gin.Default()
 	v1 := router.Group("/media")
 	{
-		v1.GET("/meta/:id", mediaRoute.Get)
-		v1.GET("/:id", mediaRoute.Download)
+		v1.GET("/:id", mediaRoute.Get)
 		v1.POST("/", mediaRoute.Upload)
 	}
 

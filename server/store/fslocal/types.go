@@ -12,6 +12,7 @@ type FileMeta struct {
 	Height    int    `json:"height"`
 	Filename  string `json:"filename"`
 	ID        string `json:"id"`
+	Duration  int    `json:"duration"`
 }
 
 func (mf *FileMeta) ToMediaMeta() *model.MediaMeta {

@@ -50,37 +50,3 @@ func (rep *MediaMetaRepo) GetMeta(mediaID string) (*model.MediaMeta, error) {
 
 	return fileMeta.ToMediaMeta(), nil
 }
-
-// func DetectType(formatName string) string {
-// 	mediaType := "unknown"
-// 	switch formatName {
-// 	case :
-// 		/* code */
-// 	default:
-// 		/* code */
-// 		return
-// 	}
-// }
-
-// func GetFileContentType(out *os.File) (string, error) {
-// 	f, err := os.Open(opath)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer f.Close()
-
-// 	contentType, err := GetFileContentType(f)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Println("Content Type: " + contentType)
-// 	buffer := make([]byte, 512)
-// 	_, err := out.Read(buffer)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	contentType := http.DetectContentType(buffer)
-// 	return contentType, nil
-// }
-

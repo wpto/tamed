@@ -19,10 +19,15 @@ type MediaVidRepo interface {
 	GetContent(*types.GetVidOpts) ([]byte, error)
 }
 
+type MediaContentRepo interface {
+	Save(contentType string, data []byte) error
+}
+
 type Store struct {
-	MediaMeta MediaMetaRepo
-	MediaPic  MediaPicRepo
-	MediaVid  MediaVidRepo
+	MediaMeta    MediaMetaRepo
+	MediaPic     MediaPicRepo
+	MediaVid     MediaVidRepo
+	MediaContent MediaContentRepo
 }
 
 func New() (*Store, error) {
@@ -34,6 +39,7 @@ func New() (*Store, error) {
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
 		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
 		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)
+		store.MediaContent = fslocal.NewMediaContentRepo(cfg.LocalPath)
 	}
 
 	return &store, nil

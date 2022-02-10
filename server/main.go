@@ -34,6 +34,7 @@ func run() error {
 	{
 		v1.GET("/meta/:id", mediaRoute.Get)
 		v1.GET("/:id", mediaRoute.Download)
+		v1.POST("/", mediaRoute.Upload)
 	}
 
 	router.Run(":1314")

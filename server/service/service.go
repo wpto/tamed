@@ -9,6 +9,7 @@ import (
 
 type MediaContentService interface {
 	Download(mediaID string, contentType string, width int, height int) ([]byte, error)
+	Upload(data []byte) error
 }
 
 type MediaMetaService interface {

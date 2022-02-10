@@ -12,6 +12,12 @@ type MediaContentSrv struct {
 	store *store.Store
 }
 
+func NewMediaContentSrv(store *store.Store) *MediaContentSrv {
+	return &MediaContentSrv{
+		store: store,
+	}
+}
+
 func (srv *MediaContentSrv) Download(mediaID string, contentType string, width int, height int) (data []byte, err error) {
 
 	meta, err := srv.store.MediaMeta.GetMeta(mediaID)
@@ -28,7 +34,6 @@ func (srv *MediaContentSrv) Download(mediaID string, contentType string, width i
 	if err != nil {
 		return nil, errors.Wrap(err, "srv.mediacontent.dl")
 	}
-
 
 	if resultMediaType != localMediaType {
 		return nil, errors.Errorf("srv.mediacontent.dl: mediatype mismatch: %s(%s) to %s(%s)", meta.Mime, localMediaType, contentType, resultMediaType)
@@ -53,10 +58,4 @@ func (srv *MediaContentSrv) Download(mediaID string, contentType string, width i
 	}
 
 	return nil, errors.Wrap(types.ErrNotImplemented, fmt.Sprintf("srv.mediacontent.dl(%s to %s)", meta.Mime, contentType))
-}
-
-func NewMediaContentSrv(store *store.Store) *MediaContentSrv {
-	return &MediaContentSrv{
-		store: store,
-	}
 }

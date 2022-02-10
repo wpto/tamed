@@ -12,6 +12,14 @@ var (
 	ErrNotImplemented = errors.New("not implemented")
 )
 
+var AcceptedMime = map[string]bool{
+	"image/jpeg": true,
+	"image/gif":  true,
+	"image/png":  true,
+	"image/webp": true,
+	"video/mp4":  true,
+}
+
 var ExtToMime = map[string]string{
 	"jpg":  "image/jpeg",
 	"gif":  "image/gif",
@@ -62,14 +70,14 @@ func GetMediaType(mime string) (string, error) {
 
 // probably bad place??
 type GetVidOpts struct {
-	MediaID string
+	MediaID     string
 	ContentType string
-	Width int
-	Audio bool
+	Width       int
+	Audio       bool
 }
 
 type GetPicOpts struct {
-	MediaID string
+	MediaID     string
 	ContentType string
-	Width int
+	Width       int
 }

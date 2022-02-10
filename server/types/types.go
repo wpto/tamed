@@ -18,6 +18,7 @@ var AcceptedMime = map[string]bool{
 	"image/png":  true,
 	"image/webp": true,
 	"video/mp4":  true,
+	"video/webm": true,
 }
 
 var ExtToMime = map[string]string{
@@ -42,6 +43,7 @@ var MimeToExt = map[string]string{
 	"image/png":  "png",
 	"image/webp": "webp",
 	"video/mp4":  "mp4",
+	"video/webm": "mkv",
 }
 
 func GetExt(mime string) (string, error) {
@@ -58,6 +60,7 @@ var MimeToMediaType = map[string]string{
 	"image/png":  "pic",
 	"image/webp": "pic",
 	"video/mp4":  "vid",
+	"video/webm": "vid",
 }
 
 func GetMediaType(mime string) (string, error) {

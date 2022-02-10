@@ -1,6 +1,8 @@
 package store
 
 import (
+	"io"
+
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store/fslocal"
@@ -20,7 +22,7 @@ type MediaVidRepo interface {
 }
 
 type MediaContentRepo interface {
-	Save(contentType string, data []byte) error
+	Save(contentType string, upload io.Reader) error
 }
 
 type Store struct {

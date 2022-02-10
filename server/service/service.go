@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"mime/multipart"
 
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store"
@@ -9,7 +10,7 @@ import (
 
 type MediaContentService interface {
 	Download(mediaID string, contentType string, width int) ([]byte, error)
-	Upload(data []byte) error
+	Upload(*multipart.FileHeader) error
 }
 
 type MediaMetaService interface {

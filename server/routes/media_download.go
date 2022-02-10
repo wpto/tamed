@@ -1,25 +1,13 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pgeowng/tamed/types"
-	"github.com/pkg/errors"
 )
-
-func (r *MediaRoute) serveMeta(c *gin.Context, mediaID string) {
-	meta, err := r.services.MediaMeta.Get(mediaID)
-	if err != nil {
-		SendError(c, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, meta)
-}
 
 func (r *MediaRoute) Get(c *gin.Context) {
 	mediaID := c.Param("id")
@@ -38,52 +26,59 @@ func (r *MediaRoute) Get(c *gin.Context) {
 		return
 	}
 
-	contentType, err := types.GetMime(formatVal)
+	contentType := ""
+	if len(formatVal) > 0 {
+		var err error
+		contentType, err = types.GetMime(formatVal)
+		if err != nil {
+			SendError(c, err)
+			return
+		}
+	}
+
+	width, err := ParseSize(sizeVal)
+	if err != nil {
+		SendError(c, err)
+		return
+	}
+	content, err := r.services.MediaContent.Download(mediaID, contentType, width)
+
 	if err != nil {
 		SendError(c, err)
 		return
 	}
 
-	width, height, err := ParseSize(sizeVal)
-	if err != nil {
-		width, height = 1200, 1200
-		// SendError(c, err)
-	}
-
-	mediaContent, err := r.services.MediaContent.Download(mediaID, contentType, width, height)
-
-	if err != nil {
-		SendError(c, err)
-		return
-	}
-
-	c.Data(http.StatusOK, contentType, mediaContent)
+	c.Data(http.StatusOK, contentType, content)
 	return
-
 }
 
-func ParseSize(val string) (width, height int, err error) {
-	tokens := strings.Split(val, "x")
-	if len(tokens) != 2 {
-		err = errors.Wrap(types.ErrBadRequest, "bad size")
-		return
-	}
-
-	num, err := strconv.ParseInt(tokens[0], 10, 0)
+func (r *MediaRoute) serveMeta(c *gin.Context, mediaID string) {
+	meta, err := r.services.MediaMeta.Get(mediaID)
 	if err != nil {
-		err = errors.Wrap(types.ErrBadRequest, "bad width")
+		SendError(c, err)
 		return
 	}
 
-	width = int(num)
+	c.JSON(http.StatusOK, meta)
+}
 
-	num, err = strconv.ParseInt(tokens[1], 10, 0)
-	if err != nil {
-		err = errors.Wrap(types.ErrBadRequest, "bad height")
-		return
+var DefaultSizeParam = 0
+var SizeParam = map[string]int{
+	"xs": 144, // height for vid should be divisible by 2
+	"s":  680,
+	"m":  1200,
+	"l":  2048,
+	"xl": 4096,
+}
+
+func ParseSize(val string) (width int, err error) {
+	if len(val) == 0 {
+		return DefaultSizeParam, nil
 	}
 
-	height = int(num)
-
-	return
+	width, ok := SizeParam[val]
+	if !ok {
+		return 0, errors.New("bad size")
+	}
+	return width, nil
 }

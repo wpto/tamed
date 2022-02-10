@@ -39,13 +39,16 @@ func (rep *MediaVidRepo) GetContent(opts *types.GetVidOpts) ([]byte, error) {
 
 	data := make([]byte, 0)
 
-	if opts.Width < meta.Width {
-		data, err = ffmpeg(
+	if opts.Width != 0 && opts.Width < meta.Width {
+		args := []string{
 			"-i", origPath,
 			"-vf", fmt.Sprintf("scale=%d:-1", opts.Width),
-			"-an")
+			"-an",
+		}
+
+		data, err = ffmpeg(args...)
 		if err != nil {
-			return nil, errors.Wrap(err, "fslocal.getvid")
+			return nil, errors.Wrap(err, fmt.Sprintf("fslocal.getvid(%v)", args))
 		}
 	} else {
 		data, err = ioutil.ReadFile(origPath)

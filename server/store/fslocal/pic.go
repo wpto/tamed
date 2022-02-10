@@ -20,7 +20,6 @@ func NewMediaPicRepo(localPath string) *MediaPicRepo {
 }
 
 func (rep *MediaPicRepo) GetContent(opts *types.GetPicOpts) (data []byte, err error) {
-	// mediaID string, contentType string, width, height int
 	dirPath := filepath.Join(rep.localPath, opts.MediaID)
 
 	meta, err := TryFileMeta(dirPath)
@@ -36,14 +35,14 @@ func (rep *MediaPicRepo) GetContent(opts *types.GetPicOpts) (data []byte, err er
 		return nil, errors.Wrap(err, "fslocal.getpic")
 	}
 
-	if opts.ContentType != meta.Mime {
+	if len(opts.ContentType) > 0 && opts.ContentType != meta.Mime {
 		data, err = formatPic(data, opts.ContentType)
 		if err != nil {
 			return nil, errors.Wrap(err, "fslocal.getpic")
 		}
 	}
 
-	if opts.Width < meta.Width {
+	if opts.Width != 0 && opts.Width < meta.Width {
 		data, err = resizePic(data, opts.Width)
 		if err != nil {
 			return nil, errors.Wrap(err, "fslocal.getpic")
@@ -92,12 +91,3 @@ func formatPic(buf []byte, mime string) ([]byte, error) {
 
 	return buf, nil
 }
-
-// 120x120 png
-// 680x680 jpg small
-// small is 680x680
-// medium is 1200x1200
-// large is 2048x2048
-// ... is 4096x4096
-// iphone - small png
-// ipad - medium png

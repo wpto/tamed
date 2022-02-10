@@ -18,14 +18,9 @@ func NewMediaContentSrv(store *store.Store) *MediaContentSrv {
 	}
 }
 
-func (srv *MediaContentSrv) Download(mediaID string, contentType string, width int, height int) (data []byte, err error) {
+func (srv *MediaContentSrv) Download(mediaID string, contentType string, width int) (data []byte, err error) {
 
 	meta, err := srv.store.MediaMeta.GetMeta(mediaID)
-	if err != nil {
-		return nil, errors.Wrap(err, "srv.mediacontent.dl")
-	}
-
-	resultMediaType, err := types.GetMediaType(contentType)
 	if err != nil {
 		return nil, errors.Wrap(err, "srv.mediacontent.dl")
 	}
@@ -35,8 +30,16 @@ func (srv *MediaContentSrv) Download(mediaID string, contentType string, width i
 		return nil, errors.Wrap(err, "srv.mediacontent.dl")
 	}
 
-	if resultMediaType != localMediaType {
-		return nil, errors.Errorf("srv.mediacontent.dl: mediatype mismatch: %s(%s) to %s(%s)", meta.Mime, localMediaType, contentType, resultMediaType)
+	resultMediaType := localMediaType
+	if len(contentType) > 0 {
+		resultMediaType, err = types.GetMediaType(contentType)
+		if err != nil {
+			return nil, errors.Wrap(err, "srv.mediacontent.dl")
+		}
+
+		if resultMediaType != localMediaType {
+			return nil, errors.Errorf("srv.mediacontent.dl: mediatype mismatch: %s(%s) to %s(%s)", meta.Mime, localMediaType, contentType, resultMediaType)
+		}
 	}
 
 	if resultMediaType == "vid" {

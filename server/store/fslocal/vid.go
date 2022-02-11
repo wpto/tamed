@@ -28,6 +28,11 @@ func TempFileName(prefix, suffix string) string {
 	return filepath.Join(os.TempDir(), prefix+hex.EncodeToString(randBytes)+suffix)
 }
 
+var CodecPresets = map[string][]string{
+	"video/mp4":  []string{"-c:v", "libx264", "-preset", "ultrafast", "-crf", "28"},
+	"video/webm": []string{},
+}
+
 func (rep *MediaVidRepo) GetContent(opts *types.GetVidOpts) ([]byte, error) {
 	dirPath := filepath.Join(rep.localPath, opts.MediaID)
 	meta, err := TryFileMeta(dirPath)
@@ -42,9 +47,14 @@ func (rep *MediaVidRepo) GetContent(opts *types.GetVidOpts) ([]byte, error) {
 	if opts.Width != 0 && opts.Width < meta.Width {
 		args := []string{
 			"-i", origPath,
-			"-vf", fmt.Sprintf("scale=%d:-2", opts.Width),
-			"-an",
 		}
+
+		args = append(args, CodecPresets["video/mp4"]...)
+
+		args = append(args, "-vf", fmt.Sprintf("scale=%d:-2", opts.Width),
+			"-an")
+
+		fmt.Println(args)
 
 		data, err = ffmpeg(args...)
 		if err != nil {

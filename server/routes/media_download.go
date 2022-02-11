@@ -48,6 +48,17 @@ func (r *MediaRoute) Get(c *gin.Context) {
 		return
 	}
 
+	if len(contentType) == 0 {
+		// MediaContent.Download should return proper MediaObj{io.Reader, contentType}
+		// temp solution
+		meta, err := r.services.MediaMeta.Get(mediaID)
+		if err != nil {
+			SendError(c, err)
+			return
+		}
+		contentType = meta.Mime
+	}
+
 	c.Data(http.StatusOK, contentType, content)
 	return
 }

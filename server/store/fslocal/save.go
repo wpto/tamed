@@ -19,7 +19,7 @@ func NewMediaContentRepo(localPath string) *MediaContentRepo {
 	return &MediaContentRepo{localPath}
 }
 
-func (rep *MediaContentRepo) Save(contentType string, upload io.Reader) error {
+func (rep *MediaContentRepo) Upload(id string, contentType string, upload io.Reader) error {
 	mediaID, err := NewId(rep.localPath)
 	if err != nil {
 		return errors.Wrap(err, "fslocal.mediacontent.save")
@@ -31,7 +31,6 @@ func (rep *MediaContentRepo) Save(contentType string, upload io.Reader) error {
 		return errors.Wrap(err, "fslocal.mediacontent.save")
 	}
 
-	// origFileName := fmt.Sprintf("%s.%s", mediaID, types.MimeToExt[contentType])
 	origFileName := mediaID
 	origPath := filepath.Join(dirPath, origFileName)
 	err = WriteMedia(origPath, upload)

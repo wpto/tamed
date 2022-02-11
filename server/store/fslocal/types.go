@@ -17,7 +17,6 @@ type FileMeta struct {
 
 func (mf *FileMeta) ToMediaMeta() *model.MediaMeta {
 	return &model.MediaMeta{
-		ID:     mf.ID,
 		Type:   mf.MediaType,
 		Mime:   mf.Mime,
 		Width:  mf.Width,

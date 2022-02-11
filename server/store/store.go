@@ -2,6 +2,7 @@ package store
 
 import (
 	"io"
+	"path/filepath"
 
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
@@ -22,10 +23,20 @@ type MediaVidRepo interface {
 }
 
 type MediaContentRepo interface {
-	Save(contentType string, upload io.Reader) error
+	Upload(id string, contentType string, upload io.Reader) error
+}
+
+type ArtRepo interface {
+	Create(entry *model.Art) error
+	Get(artID string) (*model.Art, error)
+}
+
+type UserRepo interface {
+	Get(artID string) (*model.User, error)
 }
 
 type Store struct {
+	Art          ArtRepo
 	MediaMeta    MediaMetaRepo
 	MediaPic     MediaPicRepo
 	MediaVid     MediaVidRepo
@@ -38,6 +49,7 @@ func New() (*Store, error) {
 	var store Store
 
 	if cfg.LocalPath != "" {
+		store.Art = fslocal.NewArtRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
 		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
 		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)

@@ -27,6 +27,7 @@ func run() error {
 		return errors.Wrap(err, "service.NewManager failed")
 	}
 
+	artRoute := routes.NewArtRoute(services)
 	mediaRoute := routes.NewMediaRoute(services)
 
 	router := gin.Default()
@@ -34,6 +35,14 @@ func run() error {
 	{
 		v1.GET("/:id", mediaRoute.Get)
 		v1.POST("/", mediaRoute.Upload)
+	}
+
+	art := router.Group("/art")
+	{
+		art.POST("/", artRoute.Create)
+		art.GET("/:id", artRoute.Get)
+		art.PUT("/:id", artRoute.Update)
+		art.DELETE("/:id", artRoute.Delete)
 	}
 
 	router.Run(":1314")

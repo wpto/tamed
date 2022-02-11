@@ -29,15 +29,30 @@ func (srv *MediaContentSrv) Upload(fileHeader *multipart.FileHeader) error {
 		return errors.Errorf("srv.mediacontent.upload: bad upload type %v", contentType)
 	}
 
+	id := UniqID()
+
 	file, err = fileHeader.Open()
 	if err != nil {
 		return errors.Wrap(err, "srv.mediacontent.upload")
 	}
 	defer file.Close()
-	err = srv.store.MediaContent.Save(contentType, file)
+	err = srv.store.MediaContent.Upload(id, contentType, file)
 	if err != nil {
 		return errors.Wrap(err, "srv.mediacontent.upload: save")
 	}
+
+	// meta, err := srv.store.MediaContent.Meta(id)
+	// urls, err := srv.store.MediaContent.Urls(id)
+	// social, err := srv.store.Social.Create(id)
+
+	// obj := model.Media{
+	// 	ID:         id,
+	// 	CreateTime: TimeNow(),
+	// 	UserName:   "kifuku",
+	// 	// Meta:       meta,
+	// 	// Social:     social,
+	// 	// Urls:       urls,
+	// }
 
 	return nil
 }

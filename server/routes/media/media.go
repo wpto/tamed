@@ -1,8 +1,6 @@
 package routes
 
-import (
-	"github.com/pgeowng/tamed/service"
-)
+import "github.com/pgeowng/tamed/service"
 
 type MediaRoute struct {
 	services *service.Manager

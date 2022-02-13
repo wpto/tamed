@@ -73,10 +73,3 @@ func (r *ArtRoute) Get(c *gin.Context) {
 
 	c.JSON(http.StatusOK, art)
 }
-
-func (r *ArtRoute) Update(c *gin.Context) {
-
-}
-
-func (r *ArtRoute) Delete(c *gin.Context) {
-}

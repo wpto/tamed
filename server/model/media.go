@@ -8,17 +8,21 @@ type MediaMeta struct {
 	Height int    `json:"height"`
 }
 
-type MediaUrls struct {
-	Sd     string  `json:"sd"`
-	Hd     string  `json:"hd"`
-	Poster string  `json:"poster"`
-	Thumb  string  `json:"thumb"`
-	Vthumb *string `json:"vthumb"`
-}
+// type MediaUrls struct {
+// 	Sd     string  `json:"sd"`
+// 	Hd     string  `json:"hd"`
+// 	Poster string  `json:"poster"`
+// 	Thumb  string  `json:"thumb"`
+// 	Vthumb *string `json:"vthumb"`
+// }
 
 type MediaSocial struct {
 	Likes int `json:"likes"`
 	Views int `json:"views"`
+}
+
+func NewMediaSocial() *MediaSocial {
+	return &MediaSocial{Likes: 0, Views: 0}
 }
 
 type Media struct {
@@ -27,7 +31,7 @@ type Media struct {
 	UserName   string      `json:"username"`
 	Meta       MediaMeta   `json:"meta"`
 	Social     MediaSocial `json:"social"`
-	Urls       MediaUrls   `json:"urls`
+	// Urls       MediaUrls   `json:"urls`
 }
 
 type Art struct {

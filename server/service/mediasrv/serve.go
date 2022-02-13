@@ -1,4 +1,4 @@
-package service
+package mediasrv
 
 import (
 	"fmt"

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/pgeowng/tamed/model"
+	"github.com/pgeowng/tamed/service/viewsrv"
 	"github.com/pgeowng/tamed/store"
 )
 
@@ -16,15 +17,15 @@ type MediaFileRes interface {
 
 type MediaService interface {
 	Serve(mediaID string, qualityTag string) (*MediaFileRes, error)
-	Upload()
+	Upload(contentType string, upload io.Reader) (*model.Media, error)
 }
 
 type ViewService interface {
-	ViewArt()
-	ViewRecent()
+	ViewArt(artID string) (*model.Art, error)
+	// ViewRecent()
 	ViewUser(userName string) (*model.User, error)
-	ViewTag()
-	Search()
+	// ViewTag()
+	// Search()
 }
 
 type UserService interface {
@@ -45,9 +46,9 @@ func NewManager(store *store.Store) (*Manager, error) {
 		return nil, fmt.Errorf("no store provided")
 	} else {
 		return &Manager{
-			Media: NewMediaSrv(store),
-			User:  NewUserSrv(store),
-			View:  NewViewSrv(store),
+			// Media: mediasrv.NewMediaSrv(store),
+			// User:  usersrv.NewUserSrv(store),
+			View: viewsrv.NewViewSrv(store),
 		}, nil
 	}
 }

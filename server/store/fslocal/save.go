@@ -19,14 +19,9 @@ func NewMediaContentRepo(localPath string) *MediaContentRepo {
 	return &MediaContentRepo{localPath}
 }
 
-func (rep *MediaContentRepo) Upload(id string, contentType string, upload io.Reader) error {
-	mediaID, err := NewId(rep.localPath)
-	if err != nil {
-		return errors.Wrap(err, "fslocal.mediacontent.save")
-	}
-
+func (rep *MediaContentRepo) Upload(mediaID string, contentType string, upload io.Reader) error {
 	dirPath := filepath.Join(rep.localPath, mediaID)
-	err = os.MkdirAll(dirPath, 0755)
+	err := os.MkdirAll(dirPath, 0755)
 	if err != nil {
 		return errors.Wrap(err, "fslocal.mediacontent.save")
 	}

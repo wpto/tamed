@@ -72,11 +72,16 @@ func (rep *FileRepo) Create(id string, encodedJSON []byte) error {
 	return nil
 }
 
-func (rep *FileRepo) Get(id string) (interface{}, error) {
+func (rep *FileRepo) Get(id string) ([]byte, error) {
 	db := rep.ReadDB()
-	result, ok := db[id]
+	entry, ok := db[id]
 	if !ok {
 		return nil, errors.Wrap(types.ErrNotFound, fmt.Sprintf("%s not found", id))
 	}
-	return result, nil
+
+	data, err := json.Marshal(entry)
+	if err != nil {
+		return nil, errors.Errorf("marshal error %v", entry)
+	}
+	return data, nil
 }

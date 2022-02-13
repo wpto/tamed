@@ -26,17 +26,14 @@ type MediaContentRepo interface {
 	Upload(id string, contentType string, upload io.Reader) error
 }
 
-type ArtRepo interface {
-	Create(entry *model.Art) error
-	Get(artID string) (*model.Art, error)
-}
-
-type UserRepo interface {
-	Get(artID string) (*model.User, error)
+type ViewRepo interface {
+	// Create(entry *model.Art) error
+	GetArt(artID string) (*model.Art, error)
+	GetUser(userName string) (*model.User, error)
 }
 
 type Store struct {
-	Art          ArtRepo
+	View         ViewRepo
 	MediaMeta    MediaMetaRepo
 	MediaPic     MediaPicRepo
 	MediaVid     MediaVidRepo
@@ -49,7 +46,10 @@ func New() (*Store, error) {
 	var store Store
 
 	if cfg.LocalPath != "" {
-		store.Art = fslocal.NewArtRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
+		store.View = fslocal.NewViewRepo(
+			filepath.Join(cfg.LocalPath, "artdb.json"),
+			filepath.Join(cfg.LocalPath, "userdb.json"),
+		)
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
 		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
 		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)

@@ -2,34 +2,42 @@ package service
 
 import (
 	"fmt"
-	"mime/multipart"
+	"io"
 
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store"
 )
 
-type MediaContentService interface {
-	Download(mediaID string, contentType string, width int) ([]byte, error)
-	Upload(*multipart.FileHeader) error
+type MediaFileRes interface {
+	ContentType() string
+	ContentLength() int64
+	Reader() io.Reader
 }
 
-type MediaMetaService interface {
-	Get(string) (*model.MediaMeta, error)
+type MediaService interface {
+	Serve(mediaID string, qualityTag string) (*MediaFileRes, error)
+	Upload()
 }
 
-type ArtService interface {
-	Create(userName string, media []model.Media) (*model.Art, error)
-	Get(artID string) (*model.Art, error)
+type ViewService interface {
+	ViewArt()
+	ViewRecent()
+	ViewUser(userName string) (*model.User, error)
+	ViewTag()
+	Search()
 }
 
 type UserService interface {
-	Get(userName string) (*model.User, error)
+	CreateArt()
+	DeleteArt()
+	AddTag()
+	LookFavorites()
 }
 
 type Manager struct {
-	Art          ArtService
-	MediaContent MediaContentService
-	MediaMeta    MediaMetaService
+	Media MediaService
+	User  UserService
+	View  ViewService
 }
 
 func NewManager(store *store.Store) (*Manager, error) {
@@ -37,9 +45,9 @@ func NewManager(store *store.Store) (*Manager, error) {
 		return nil, fmt.Errorf("no store provided")
 	} else {
 		return &Manager{
-			Art:          NewArtSrv(store),
-			MediaContent: NewMediaContentSrv(store),
-			MediaMeta:    NewMediaMetaSrv(store),
+			Media: NewMediaSrv(store),
+			User:  NewUserSrv(store),
+			View:  NewViewSrv(store),
 		}, nil
 	}
 }

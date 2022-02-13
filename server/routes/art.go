@@ -24,15 +24,27 @@ func (r *ArtRoute) Create(c *gin.Context) {
 	}
 
 	files := form.File["upload[]"]
-	mediaList := make([]model.Media, 0)
+	metaList := make([]model.MediaMeta, 0)
 	for _, fileHeader := range files {
-		media, err := r.services.MediaContent.Upload(fileHeader)
+		mediaID, err := r.services.MediaMeta.Create()
 		if err != nil {
-			for _, media := range mediaList {
-				// r.services.MediaContent.MarkClean(media.ID)
-			}
+			SendError(c, err)
+			return
 		}
-		mediaList = append(mediaList, media)
+
+		err := r.services.MediaContent.Upload(mediaID, fileHeader)
+		if err != nil {
+			SendError(c, err)
+			return
+		}
+
+		meta, err := r.services.MediaMeta.Get(mediaID)
+		if err != nil {
+			SendError(c, err)
+			return
+		}
+
+		metaList = append(mediaList, media)
 	}
 
 	userName := "kifuku"

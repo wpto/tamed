@@ -6,11 +6,12 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/types"
 	"github.com/pkg/errors"
 )
 
-func (srv *MediaContentSrv) Upload(fileHeader *multipart.FileHeader) error {
+func (srv *MediaContentSrv) Upload(fileHeader *multipart.FileHeader) (*model.MediaMeta, error) {
 	if fileHeader.Size == 0 {
 		return errors.New("srv.mediacontent.upload: empty data")
 	}

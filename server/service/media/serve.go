@@ -3,22 +3,11 @@ package service
 import (
 	"fmt"
 
-	"github.com/pgeowng/tamed/store"
 	"github.com/pgeowng/tamed/types"
 	"github.com/pkg/errors"
 )
 
-type MediaContentSrv struct {
-	store *store.Store
-}
-
-func NewMediaContentSrv(store *store.Store) *MediaContentSrv {
-	return &MediaContentSrv{
-		store: store,
-	}
-}
-
-func (srv *MediaContentSrv) Download(mediaID string, contentType string, width int) (data []byte, err error) {
+func (srv *MediaSrv) Download(mediaID string, contentType string, width int) (data []byte, err error) {
 
 	meta, err := srv.store.MediaMeta.GetMeta(mediaID)
 	if err != nil {

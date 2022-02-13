@@ -1,17 +1,5 @@
 package service
 
-import (
-	"github.com/pgeowng/tamed/store"
-)
-
-type UserSrv struct {
-	store *store.Store
-}
-
-func NewUserSrv(store *store.Store) *UserSrv {
-	return &UserSrv{store}
-}
-
 // func (srv *UserSrv) Get(userName string) (result *model.User, err error) {
 // 	result, err = srv.store.User.Get(userName)
 // 	if err != nil {

@@ -60,3 +60,5 @@ func (rep *ViewRepo) GetUser(userName string) (*model.User, error) {
 
 	return &result, nil
 }
+
+func (rep *ViewRepo) Search() {}

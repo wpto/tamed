@@ -61,3 +61,18 @@ type User struct {
 		Views     int `json:"views"`
 	} `json:"social"`
 }
+
+type SearchResponse struct {
+	Page  int    `json:"page"`
+	Pages int    `json:"pages"`
+	Total int    `json:"total"`
+	Arts  []Art  `json:"arts"`
+	Users []User `json:"users"`
+}
+
+type SearchRequest struct {
+	Username string
+	Count    uint64
+	Offset   uint64
+	Order    string
+}

@@ -1,7 +1,9 @@
 package usersrv
 
 import (
+	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store"
+	"github.com/pkg/errors"
 )
 
 type UserSrv struct {
@@ -12,19 +14,19 @@ func NewUserSrv(store *store.Store) *UserSrv {
 	return &UserSrv{store}
 }
 
-// func (srv *UserSrv) Create(userName string, media []model.Media) (*model.Art, error) {
+func (srv *UserSrv) Create(userName string, media []model.Media) (*model.Art, error) {
 
-// 	obj := model.Art{
-// 		ID:         UniqID(),
-// 		CreateTime: TimeNow(),
-// 		UserName:   userName,
-// 		Media:      media,
-// 	}
+	obj := model.Art{
+		ID:         UniqID(),
+		CreateTime: TimeNow(),
+		UserName:   userName,
+		Media:      media,
+	}
 
-// 	err := srv.store.Art.Create(&obj)
-// 	if err != nil {
-// 		return nil, errors.Wrap(err, "srv.art.create.store")
-// 	}
+	err := srv.store.Art.Create(&obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.art.create.store")
+	}
 
-// 	return &obj, nil
-// }
+	return &obj, nil
+}

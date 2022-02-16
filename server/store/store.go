@@ -22,8 +22,9 @@ type MediaVidRepo interface {
 	GetContent(*types.GetVidOpts) ([]byte, error)
 }
 
-type MediaContentRepo interface {
-	Upload(id string, contentType string, upload io.Reader) error
+type UserRepo interface {
+	UploadMedia(mediaID string, contentType string, upload io.Reader) error
+	CreateMedia(mediaID string, obj *model.Media) error
 }
 
 type ViewRepo interface {
@@ -33,11 +34,12 @@ type ViewRepo interface {
 }
 
 type Store struct {
-	View         ViewRepo
-	MediaMeta    MediaMetaRepo
-	MediaPic     MediaPicRepo
-	MediaVid     MediaVidRepo
-	MediaContent MediaContentRepo
+	View      ViewRepo
+	User      UserRepo
+	MediaMeta MediaMetaRepo
+	MediaPic  MediaPicRepo
+	MediaVid  MediaVidRepo
+	// MediaContent MediaContentRepo
 }
 
 func New() (*Store, error) {
@@ -46,14 +48,21 @@ func New() (*Store, error) {
 	var store Store
 
 	if cfg.LocalPath != "" {
+		artRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
+		userRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "userdb.json"))
+		mediaMetaRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "mediadb.json"))
 		store.View = fslocal.NewViewRepo(
-			filepath.Join(cfg.LocalPath, "artdb.json"),
-			filepath.Join(cfg.LocalPath, "userdb.json"),
+			artRepo,
+			userRepo,
+			mediaMetaRepo,
+		)
+		store.User = fslocal.NewUserRepo(
+			cfg.LocalPath,
+			mediaMetaRepo,
 		)
 		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
 		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
 		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)
-		store.MediaContent = fslocal.NewMediaContentRepo(cfg.LocalPath)
 	}
 
 	return &store, nil

@@ -19,36 +19,6 @@ func NewViewRoute(services *service.Manager) *ViewRoute {
 	return &ViewRoute{services}
 }
 
-// func (r *ViewRoute) Create(c *gin.Context) {
-// 	form, err := c.MultipartForm()
-// 	if err != nil {
-// 		commonroute.SendError(c, err)
-// 		return
-// 	}
-
-// 	files := form.File["upload[]"]
-// 	metaList := make([]model.MediaMeta, 0)
-// 	for _, fileHeader := range files {
-// 		media, err := r.services.Media.Upload(fileHeader)
-// 		if err != nil {
-// 			commonroute.SendError(c, err)
-// 			return
-// 		}
-
-// 		metaList = append(mediaList, media)
-// 	}
-
-// 	userName := "kifuku"
-
-// 	obj, err := r.services.Art.Create(userName, mediaList)
-// 	if err != nil {
-// 		commonroute.SendError(c, err)
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusCreated, obj)
-// }
-
 func (r *ViewRoute) ViewArt(c *gin.Context) {
 	artID := c.Param("id")
 

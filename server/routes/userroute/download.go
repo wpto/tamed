@@ -1,4 +1,4 @@
-package mediaroute
+package userroute
 
 // func (r *MediaRoute) Get(c *gin.Context) {
 // 	mediaID := c.Param("id")

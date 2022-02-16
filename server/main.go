@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pgeowng/tamed/routes/userroute"
 	"github.com/pgeowng/tamed/routes/viewroute"
 	"github.com/pgeowng/tamed/service"
 	"github.com/pgeowng/tamed/store"
@@ -27,14 +28,20 @@ func run() error {
 		return errors.Wrap(err, "service.NewManager failed")
 	}
 
-	viewRoute := viewroute.NewViewRoute(services)
-
 	router := gin.Default()
+
+	viewRoute := viewroute.NewViewRoute(services)
 	view := router.Group("/view")
 	{
 		view.GET("/art/:id", viewRoute.ViewArt)
 		view.GET("/user/:id", viewRoute.ViewUser)
 		view.GET("/search", viewRoute.Search)
+	}
+
+	userRoute := userroute.NewUserRoute(services)
+	user := router.Group("/user")
+	{
+		user.POST("/art", userRoute.CreateArt)
 	}
 
 	router.Run(":1314")

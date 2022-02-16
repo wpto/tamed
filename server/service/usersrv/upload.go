@@ -1,24 +1,26 @@
-package mediasrv
+package usersrv
 
 import (
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 
 	"github.com/pgeowng/tamed/model"
+	"github.com/pgeowng/tamed/service/commonsrv"
 	"github.com/pgeowng/tamed/types"
 	"github.com/pkg/errors"
 )
 
-func (srv *MediaContentSrv) Upload(fileHeader *multipart.FileHeader) (*model.Media, error) {
+func (srv *UserSrv) Upload(fileHeader *multipart.FileHeader) (*model.Media, error) {
 	if fileHeader.Size == 0 {
-		return errors.New("srv.media.upload: empty data")
+		return nil, errors.New("srv.user.upload: empty data")
 	}
 
 	file, err := fileHeader.Open()
 	if err != nil {
-		return errors.Wrap(err, "srv.media.upload")
+		return nil, errors.Wrap(err, "srv.user.upload")
 	}
 
 	contentType, err := GuessContentType(file)
@@ -27,30 +29,36 @@ func (srv *MediaContentSrv) Upload(fileHeader *multipart.FileHeader) (*model.Med
 
 	_, ok := types.AcceptedMime[contentType]
 	if !ok {
-		return errors.Errorf("srv.media.upload: bad upload type %v", contentType)
+		return nil, errors.Errorf("srv.user.upload: bad upload type %v", contentType)
 	}
 
-	id := UniqID()
+	id := commonsrv.UniqID()
 
 	file, err = fileHeader.Open()
 	if err != nil {
-		return errors.Wrap(err, "srv.media.upload")
+		return nil, errors.Wrap(err, "srv.user.upload")
 	}
 	defer file.Close()
-	meta, err = srv.store.MediaContent.Upload(id, contentType, file)
+	log.Println("uploading!!")
+	err = srv.store.User.UploadMedia(id, contentType, file)
 	if err != nil {
-		return errors.Wrap(err, "srv.media.upload: save")
+		return nil, errors.Wrap(err, "srv.user.upload: save")
 	}
 
 	obj := model.Media{
 		ID:         id,
-		CreateTime: TimeNow(),
+		CreateTime: commonsrv.TimeNow(),
 		UserName:   "kifuku",
-		Meta:       meta,
-		Social:     model.NewMediaSocial(),
+		// Meta:       meta,
+		// Social: *model.NewMediaSocial(),
 	}
 
-	return nil
+	err = srv.store.User.CreateMedia(id, &obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.user.upload: db add")
+	}
+
+	return &obj, nil
 }
 
 func GuessContentType(file io.Reader) (string, error) {

@@ -40,7 +40,7 @@ func (rep *FileRepo) ReadDB() map[string]interface{} {
 }
 
 func (rep *FileRepo) WriteDB(db map[string]interface{}) error {
-	text, err := json.Marshal(db)
+	text, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "writedb.marshal")
 	}

@@ -8,28 +8,14 @@ import (
 )
 
 type ViewRepo struct {
-	artRepo  *FileRepo
-	userRepo *FileRepo
+	artRepo   *FileRepo
+	userRepo  *FileRepo
+	mediaRepo *FileRepo
 }
 
-func NewViewRepo(artpath string, userpath string) *ViewRepo {
-	return &ViewRepo{NewFileRepo(artpath), NewFileRepo(userpath)}
+func NewViewRepo(artRepo *FileRepo, userRepo *FileRepo, mediaRepo *FileRepo) *ViewRepo {
+	return &ViewRepo{artRepo, userRepo, mediaRepo}
 }
-
-// func (rep *ViewRepo) Create(entry *model.Art) error {
-// 	id := entry.ID
-// 	body, err := json.Marshal(entry)
-// 	if err != nil {
-// 		return errors.Wrap(err, "viewrepo.create.marshal")
-// 	}
-
-// 	err = rep.fileRepo.Create(id, body)
-// 	if err != nil {
-// 		return errors.Wrap(err, "viewrepo.create")
-// 	}
-
-// 	return nil
-// }
 
 func (rep *ViewRepo) GetArt(artID string) (*model.Art, error) {
 	data, err := rep.artRepo.Get(artID)
@@ -53,6 +39,21 @@ func (rep *ViewRepo) GetUser(userName string) (*model.User, error) {
 	}
 
 	var result model.User
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, errors.New("viewrepo: typecast error")
+	}
+
+	return &result, nil
+}
+
+func (rep *ViewRepo) GetMedia(mediaID string) (*model.Media, error) {
+	data, err := rep.mediaRepo.Get(mediaID)
+	if err != nil {
+		return nil, errors.Wrap(err, "viewrepo")
+	}
+
+	var result model.Media
 	err = json.Unmarshal(data, &result)
 	if err != nil {
 		return nil, errors.New("viewrepo: typecast error")

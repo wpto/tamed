@@ -3,8 +3,10 @@ package service
 import (
 	"fmt"
 	"io"
+	"mime/multipart"
 
 	"github.com/pgeowng/tamed/model"
+	"github.com/pgeowng/tamed/service/usersrv"
 	"github.com/pgeowng/tamed/service/viewsrv"
 	"github.com/pgeowng/tamed/store"
 )
@@ -17,7 +19,6 @@ type MediaFileRes interface {
 
 type MediaService interface {
 	Serve(mediaID string, qualityTag string) (*MediaFileRes, error)
-	Upload(contentType string, upload io.Reader) (*model.Media, error)
 }
 
 type ViewService interface {
@@ -29,10 +30,11 @@ type ViewService interface {
 }
 
 type UserService interface {
-	CreateArt()
-	DeleteArt()
-	AddTag()
-	LookFavorites()
+	Upload(fileHeader *multipart.FileHeader) (*model.Media, error)
+	CreateArt(userName string, media []model.Media) (*model.Art, error)
+	// DeleteArt()
+	// AddTag()
+	// LookFavorites()
 }
 
 type Manager struct {
@@ -47,8 +49,8 @@ func NewManager(store *store.Store) (*Manager, error) {
 	} else {
 		return &Manager{
 			// Media: mediasrv.NewMediaSrv(store),
-			// User:  usersrv.NewUserSrv(store),
 			View: viewsrv.NewViewSrv(store),
+			User: usersrv.NewUserSrv(store),
 		}, nil
 	}
 }

@@ -26,11 +26,11 @@ func NewMediaSocial() *MediaSocial {
 }
 
 type Media struct {
-	ID         string      `json:"id"`
-	CreateTime string      `json:"create_time"`
-	UserName   string      `json:"username"`
-	Meta       MediaMeta   `json:"meta"`
-	Social     MediaSocial `json:"social"`
+	ID         string    `json:"id"`
+	CreateTime string    `json:"create_time"`
+	UserName   string    `json:"username"`
+	Meta       MediaMeta `json:"meta"`
+	// Social     MediaSocial `json:"social"`
 	// Urls       MediaUrls   `json:"urls`
 }
 

@@ -1,4 +1,4 @@
-package fslocal
+package localfs
 
 import (
 	"encoding/json"
@@ -10,20 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type FileRepo struct {
-	filePath string
-}
-
-func NewFileRepo(filePath string) *FileRepo {
-	return &FileRepo{filePath}
-}
-
-func (rep *FileRepo) ReadDB() map[string]interface{} {
-	if _, err := os.Stat(rep.filePath); os.IsNotExist(err) {
+func (repo FileRepo) ReadDB() map[string]interface{} {
+	if _, err := os.Stat(repo.filePath); os.IsNotExist(err) {
 		return make(map[string]interface{}, 0)
 	}
 
-	file, err := ioutil.ReadFile(rep.filePath)
+	file, err := ioutil.ReadFile(repo.filePath)
 	if err != nil {
 		fmt.Printf("filerepo.readdb.read %v", err)
 		return make(map[string]interface{}, 0)
@@ -39,13 +31,13 @@ func (rep *FileRepo) ReadDB() map[string]interface{} {
 	return db
 }
 
-func (rep *FileRepo) WriteDB(db map[string]interface{}) error {
+func (repo FileRepo) WriteDB(db map[string]interface{}) error {
 	text, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "writedb.marshal")
 	}
 
-	err = ioutil.WriteFile(rep.filePath, text, 0644)
+	err = ioutil.WriteFile(repo.filePath, text, 0644)
 	if err != nil {
 		return errors.Wrap(err, "writedb.write")
 	}
@@ -53,27 +45,27 @@ func (rep *FileRepo) WriteDB(db map[string]interface{}) error {
 	return nil
 }
 
-func (rep *FileRepo) Create(id string, encodedJSON []byte) error {
+func (repo FileRepo) Create(id string, encodedJSON []byte) error {
 	var entry interface{}
 	err := json.Unmarshal(encodedJSON, &entry)
 	if err != nil {
 		return errors.Wrap(err, "filerepo.create.unmarshal_entry")
 	}
 
-	db := rep.ReadDB()
+	db := repo.ReadDB()
 	_, ok := db[id]
 	if ok {
 		return errors.Errorf("filerepo.create.db: id collision for %s", id)
 	}
 
 	db[id] = entry
-	rep.WriteDB(db)
+	repo.WriteDB(db)
 
 	return nil
 }
 
-func (rep *FileRepo) Get(id string) ([]byte, error) {
-	db := rep.ReadDB()
+func (repo FileRepo) Get(id string) ([]byte, error) {
+	db := repo.ReadDB()
 	entry, ok := db[id]
 	if !ok {
 		return nil, errors.Wrap(types.ErrNotFound, fmt.Sprintf("%s not found", id))

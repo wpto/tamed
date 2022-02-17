@@ -3,7 +3,6 @@ package model
 type MediaMeta struct {
 	Type   string `json:"type"` // ? 1 for vid 2 for img
 	Mime   string `json:"mime"` // ? removed
-	Audio  bool   `json:"audio"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 }

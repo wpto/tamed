@@ -6,40 +6,33 @@ import (
 
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
-	"github.com/pgeowng/tamed/store/fslocal"
-	"github.com/pgeowng/tamed/types"
+	"github.com/pgeowng/tamed/store/localfs"
 )
 
-type MediaMetaRepo interface {
-	GetMeta(string) (*model.MediaMeta, error)
+type FileRepo interface {
+	Create(id string, encodedJSON []byte) error
+	Get(id string) ([]byte, error)
 }
 
-type MediaPicRepo interface {
-	GetContent(*types.GetPicOpts) ([]byte, error)
+type MediaRepo interface {
+	Alloc(mediaID string, ext string) (localPath string, err error)
+	UploadReader(mediaID, ext string, upload io.Reader) error
 }
 
-type MediaVidRepo interface {
-	GetContent(*types.GetVidOpts) ([]byte, error)
-}
-
-type UserRepo interface {
+type UserStore interface {
 	UploadMedia(mediaID string, contentType string, upload io.Reader) error
 	CreateMedia(mediaID string, obj *model.Media) error
 }
 
-type ViewRepo interface {
+type ViewStore interface {
 	// Create(entry *model.Art) error
 	GetArt(artID string) (*model.Art, error)
 	GetUser(userName string) (*model.User, error)
 }
 
 type Store struct {
-	View      ViewRepo
-	User      UserRepo
-	MediaMeta MediaMetaRepo
-	MediaPic  MediaPicRepo
-	MediaVid  MediaVidRepo
-	// MediaContent MediaContentRepo
+	View ViewStore
+	User UserStore
 }
 
 func New() (*Store, error) {
@@ -48,21 +41,22 @@ func New() (*Store, error) {
 	var store Store
 
 	if cfg.LocalPath != "" {
-		artRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
-		userRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "userdb.json"))
-		mediaMetaRepo := fslocal.NewFileRepo(filepath.Join(cfg.LocalPath, "mediadb.json"))
-		store.View = fslocal.NewViewRepo(
+
+		artRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
+		userRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "userdb.json"))
+		mediaRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "mediadb.json"))
+		mediaFileRepo := localfs.NewMediaRepo(filepath.Join(cfg.LocalPath, "mediacontent"))
+
+		store.View = NewViewStoreImpl(
 			artRepo,
 			userRepo,
-			mediaMetaRepo,
+			mediaRepo,
 		)
-		store.User = fslocal.NewUserRepo(
-			cfg.LocalPath,
-			mediaMetaRepo,
+
+		store.User = NewUserStoreImpl(
+			mediaRepo,
+			mediaFileRepo,
 		)
-		store.MediaMeta = fslocal.NewMediaMetaRepo(cfg.LocalPath)
-		store.MediaPic = fslocal.NewMediaPicRepo(cfg.LocalPath)
-		store.MediaVid = fslocal.NewMediaVidRepo(cfg.LocalPath)
 	}
 
 	return &store, nil

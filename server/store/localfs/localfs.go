@@ -1,7 +1,6 @@
-package fslocal
+package localfs
 
 import (
-	"github.com/h2non/bimg"
 	"github.com/pgeowng/tamed/model"
 )
 
@@ -24,9 +23,18 @@ func (mf *FileMeta) ToMediaMeta() *model.MediaMeta {
 	}
 }
 
-var MimeToBimg = map[string]bimg.ImageType{
-	"image/jpeg": bimg.JPEG,
-	"image/gif":  bimg.GIF,
-	"image/png":  bimg.PNG,
-	"image/webp": bimg.WEBP,
+type FileRepo struct {
+	filePath string
+}
+
+func NewFileRepo(filePath string) FileRepo {
+	return FileRepo{filePath}
+}
+
+type MediaRepo struct {
+	localPath string
+}
+
+func NewMediaRepo(localPath string) MediaRepo {
+	return MediaRepo{localPath}
 }

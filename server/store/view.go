@@ -1,4 +1,4 @@
-package fslocal
+package store
 
 import (
 	"encoding/json"
@@ -7,17 +7,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ViewRepo struct {
-	artRepo   *FileRepo
-	userRepo  *FileRepo
-	mediaRepo *FileRepo
+type ViewStoreImpl struct {
+	artRepo   FileRepo
+	userRepo  FileRepo
+	mediaRepo FileRepo
 }
 
-func NewViewRepo(artRepo *FileRepo, userRepo *FileRepo, mediaRepo *FileRepo) *ViewRepo {
-	return &ViewRepo{artRepo, userRepo, mediaRepo}
+func NewViewStoreImpl(artRepo FileRepo, userRepo FileRepo, mediaRepo FileRepo) *ViewStoreImpl {
+	return &ViewStoreImpl{artRepo, userRepo, mediaRepo}
 }
 
-func (rep *ViewRepo) GetArt(artID string) (*model.Art, error) {
+func (rep ViewStoreImpl) GetArt(artID string) (*model.Art, error) {
 	data, err := rep.artRepo.Get(artID)
 	if err != nil {
 		return nil, errors.Wrap(err, "viewrepo")
@@ -32,7 +32,7 @@ func (rep *ViewRepo) GetArt(artID string) (*model.Art, error) {
 	return &result, nil
 }
 
-func (rep *ViewRepo) GetUser(userName string) (*model.User, error) {
+func (rep ViewStoreImpl) GetUser(userName string) (*model.User, error) {
 	data, err := rep.userRepo.Get(userName)
 	if err != nil {
 		return nil, errors.Wrap(err, "viewrepo")
@@ -47,7 +47,7 @@ func (rep *ViewRepo) GetUser(userName string) (*model.User, error) {
 	return &result, nil
 }
 
-func (rep *ViewRepo) GetMedia(mediaID string) (*model.Media, error) {
+func (rep ViewStoreImpl) GetMedia(mediaID string) (*model.Media, error) {
 	data, err := rep.mediaRepo.Get(mediaID)
 	if err != nil {
 		return nil, errors.Wrap(err, "viewrepo")
@@ -62,4 +62,4 @@ func (rep *ViewRepo) GetMedia(mediaID string) (*model.Media, error) {
 	return &result, nil
 }
 
-func (rep *ViewRepo) Search() {}
+func (rep ViewStoreImpl) Search() {}

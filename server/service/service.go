@@ -26,7 +26,7 @@ type ViewService interface {
 	// ViewRecent()
 	ViewUser(userName string) (*model.User, error)
 	// ViewTag()
-	// Search()
+	Search() (*model.SearchResponse, error)
 }
 
 type UserService interface {

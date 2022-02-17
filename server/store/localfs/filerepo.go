@@ -77,3 +77,18 @@ func (repo FileRepo) Get(id string) ([]byte, error) {
 	}
 	return data, nil
 }
+
+func (repo FileRepo) All() ([]byte, error) {
+	db := repo.ReadDB()
+	result := make([]interface{}, 0)
+	for _, entry := range db {
+		result = append(result, entry)
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		return nil, errors.Errorf("filerepo.all.marshal %v", err)
+	}
+
+	return data, nil
+}

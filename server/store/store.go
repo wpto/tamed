@@ -12,6 +12,7 @@ import (
 type FileRepo interface {
 	Create(id string, encodedJSON []byte) error
 	Get(id string) ([]byte, error)
+	All() ([]byte, error)
 }
 
 type MediaRepo interface {
@@ -28,6 +29,7 @@ type ViewStore interface {
 	// Create(entry *model.Art) error
 	GetArt(artID string) (*model.Art, error)
 	GetUser(userName string) (*model.User, error)
+	SearchArt() ([]model.Art, error)
 }
 
 type Store struct {

@@ -41,3 +41,24 @@ func (srv *ViewSrv) ViewUser(userName string) (result *model.User, err error) {
 
 	return
 }
+
+func (srv *ViewSrv) Search() (*model.SearchResponse, error) {
+
+	user, err := srv.store.View.GetUser("kifuku")
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.view.search.user")
+	}
+
+	arts, err := srv.store.View.SearchArt()
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.view.search.media")
+	}
+
+	return &model.SearchResponse{
+		Page:  1,
+		Pages: 1,
+		Total: len(arts),
+		Arts:  arts,
+		Users: []model.User{*user},
+	}, nil
+}

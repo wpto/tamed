@@ -1,25 +1,26 @@
-.grid {
+
+/* bottom nav */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding: 0 1em 1em;
+
   display: flex;
-  padding: 8px;
+  justify-content: space-around;
+  transition: bottom 300ms;
+
+  --icon-size: 32px;
 }
 
-.grid__column {
-  flex: 1 0 0;
+@media screen and (min-width: 479px) {
+  .bottom-nav {
+    --icon-size: 40px;
+  }
 }
 
-.grid__column:not(:last-child) {
-  margin-right: 8px;
-}
-
-.grid__column-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.grid__column-container > :not(:last-child) {
-  margin-bottom: 8px;
-}
-
-.image {
-  width: 100%;
+.bottom-nav--hidden {
+  bottom: -65px;
 }

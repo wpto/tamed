@@ -4,6 +4,7 @@ import (
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/service/commonsrv"
 	"github.com/pgeowng/tamed/store"
+	"github.com/pkg/errors"
 )
 
 type UserSrv struct {
@@ -23,10 +24,10 @@ func (srv *UserSrv) CreateArt(userName string, media []model.Media) (*model.Art,
 		Media:      media,
 	}
 
-	// err := srv.store.Art.Create(&obj)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "srv.art.create.store")
-	// }
+	err := srv.store.User.CreateArt(obj.ID, &obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "srv.art.create.store")
+	}
 
 	return &obj, nil
 }

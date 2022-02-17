@@ -10,12 +10,13 @@ import (
 )
 
 type UserStoreImpl struct {
+	artRepo       FileRepo
 	mediaMetaRepo FileRepo
 	mediaRepo     MediaRepo
 }
 
-func NewUserStoreImpl(mediaMetaRepo FileRepo, mediaRepo MediaRepo) *UserStoreImpl {
-	return &UserStoreImpl{mediaMetaRepo, mediaRepo}
+func NewUserStoreImpl(artRepo FileRepo, mediaMetaRepo FileRepo, mediaRepo MediaRepo) *UserStoreImpl {
+	return &UserStoreImpl{artRepo, mediaMetaRepo, mediaRepo}
 }
 
 func (rep UserStoreImpl) UploadMedia(mediaID string, contentType string, upload io.Reader) error {
@@ -77,6 +78,21 @@ func (rep UserStoreImpl) CreateMedia(mediaID string, obj *model.Media) error {
 	err = rep.mediaMetaRepo.Create(mediaID, enc)
 	if err != nil {
 		return errors.Wrap(err, "user.create_media")
+	}
+
+	return nil
+}
+
+func (rep UserStoreImpl) CreateArt(artID string, obj *model.Art) error {
+
+	enc, err := json.Marshal(*obj)
+	if err != nil {
+		return errors.Wrap(err, "user.create_art")
+	}
+
+	err = rep.artRepo.Create(artID, enc)
+	if err != nil {
+		return errors.Wrap(err, "user.create_art")
 	}
 
 	return nil

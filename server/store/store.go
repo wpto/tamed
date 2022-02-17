@@ -23,6 +23,7 @@ type MediaRepo interface {
 type UserStore interface {
 	UploadMedia(mediaID string, contentType string, upload io.Reader) error
 	CreateMedia(mediaID string, obj *model.Media) error
+	CreateArt(artID string, obj *model.Art) error
 }
 
 type ViewStore interface {
@@ -56,6 +57,7 @@ func New() (*Store, error) {
 		)
 
 		store.User = NewUserStoreImpl(
+			artRepo,
 			mediaRepo,
 			mediaFileRepo,
 		)

@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (repo FileRepo) ReadDB() map[string]interface{} {
+func (repo *FileRepo) ReadDB() map[string]interface{} {
 	if _, err := os.Stat(repo.filePath); os.IsNotExist(err) {
 		return make(map[string]interface{}, 0)
 	}
@@ -31,7 +31,7 @@ func (repo FileRepo) ReadDB() map[string]interface{} {
 	return db
 }
 
-func (repo FileRepo) WriteDB(db map[string]interface{}) error {
+func (repo *FileRepo) WriteDB(db map[string]interface{}) error {
 	text, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "writedb.marshal")
@@ -45,7 +45,7 @@ func (repo FileRepo) WriteDB(db map[string]interface{}) error {
 	return nil
 }
 
-func (repo FileRepo) Create(id string, encodedJSON []byte) error {
+func (repo *FileRepo) Create(id string, encodedJSON []byte) error {
 	var entry interface{}
 	err := json.Unmarshal(encodedJSON, &entry)
 	if err != nil {
@@ -64,7 +64,7 @@ func (repo FileRepo) Create(id string, encodedJSON []byte) error {
 	return nil
 }
 
-func (repo FileRepo) Get(id string) ([]byte, error) {
+func (repo *FileRepo) Get(id string) ([]byte, error) {
 	db := repo.ReadDB()
 	entry, ok := db[id]
 	if !ok {
@@ -78,7 +78,7 @@ func (repo FileRepo) Get(id string) ([]byte, error) {
 	return data, nil
 }
 
-func (repo FileRepo) All() ([]byte, error) {
+func (repo *FileRepo) All() ([]byte, error) {
 	db := repo.ReadDB()
 	result := make([]interface{}, 0)
 	for _, entry := range db {
@@ -91,4 +91,19 @@ func (repo FileRepo) All() ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func (repo *FileRepo) Write(id string, encodedJSON []byte) error {
+	var entry interface{}
+	err := json.Unmarshal(encodedJSON, &entry)
+	if err != nil {
+		return errors.Wrap(err, "filerepo.create.unmarshal_entry")
+	}
+
+	db := repo.ReadDB()
+
+	db[id] = entry
+	repo.WriteDB(db)
+
+	return nil
 }

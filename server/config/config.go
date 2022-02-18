@@ -1,11 +1,15 @@
 package config
 
 type Config struct {
-	LocalPath string
+	LocalPath  string
+	MediaPath  string
+	PostDBPath string
 }
 
 var config Config = Config{
-	LocalPath: "../local",
+	LocalPath:  "../local",
+	MediaPath:  "../mediacontent",
+	PostDBPath: "../post.json",
 }
 
 func Get() *Config {

@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (repo MediaRepo) Alloc(mediaID string, ext string) (string, error) {
+func (repo *MediaRepo) UploadReader(mediaID string, ext string, upload io.Reader) (string, error) {
 	dirPath := filepath.Join(repo.localPath, mediaID)
 	err := os.MkdirAll(dirPath, 0755)
 	if err != nil {
-		return "", errors.Wrap(err, "mediarepo.alloc")
+		return "", errors.Wrap(err, "mediarepo.upload")
 	}
 
 	fileName := mediaID
@@ -21,21 +21,13 @@ func (repo MediaRepo) Alloc(mediaID string, ext string) (string, error) {
 	}
 
 	filePath := filepath.Join(dirPath, fileName)
-	return filePath, nil
-}
-
-func (repo MediaRepo) UploadReader(mediaID string, ext string, upload io.Reader) error {
-	filePath, err := repo.Alloc(mediaID, ext)
-	if err != nil {
-		return errors.Wrap(err, "mediarepo.upload")
-	}
 
 	err = WriteMedia(filePath, upload)
 	if err != nil {
-		return errors.Wrap(err, "mediarepo.upload")
+		return "", errors.Wrap(err, "mediarepo.upload")
 	}
 
-	return nil
+	return mediaID + "/" + fileName, nil
 }
 
 func WriteMedia(localPath string, upload io.Reader) error {

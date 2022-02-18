@@ -2,7 +2,6 @@ package store
 
 import (
 	"io"
-	"path/filepath"
 
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
@@ -11,31 +10,32 @@ import (
 
 type FileRepo interface {
 	Create(id string, encodedJSON []byte) error
+	Write(id string, encodedJSON []byte) error
 	Get(id string) ([]byte, error)
 	All() ([]byte, error)
 }
 
 type MediaRepo interface {
-	Alloc(mediaID string, ext string) (localPath string, err error)
-	UploadReader(mediaID, ext string, upload io.Reader) error
+	UploadReader(mediaID, ext string, upload io.Reader) (filePath string, err error)
 }
 
-type UserStore interface {
-	UploadMedia(mediaID string, contentType string, upload io.Reader) error
-	CreateMedia(mediaID string, obj *model.Media) error
-	CreateArt(artID string, obj *model.Art) error
+type MediaStore interface {
+	Upload(mediaID string, ext string, upload io.Reader) (filePath string, err error)
 }
 
-type ViewStore interface {
-	// Create(entry *model.Art) error
-	GetArt(artID string) (*model.Art, error)
-	GetUser(userName string) (*model.User, error)
-	SearchArt() ([]model.Art, error)
+type PostStore interface {
+	Get(postID string) (*model.Post, error)
+	Query(query *model.PostQuery) (*model.PostList, error)
+	Create(postID string, post *model.Post) error
+	Modify(postID string, changes *model.PostChanges) error
+	Delete(postID string) error
 }
 
 type Store struct {
-	View ViewStore
-	User UserStore
+	// View ViewStore
+	// User UserStore
+	Media MediaStore
+	Post  PostStore
 }
 
 func New() (*Store, error) {
@@ -44,23 +44,11 @@ func New() (*Store, error) {
 	var store Store
 
 	if cfg.LocalPath != "" {
+		mediaRepo := localfs.NewMediaRepo(config.Get().MediaPath)
+		postRepo := localfs.NewFileRepo(config.Get().PostDBPath)
 
-		artRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "artdb.json"))
-		userRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "userdb.json"))
-		mediaRepo := localfs.NewFileRepo(filepath.Join(cfg.LocalPath, "mediadb.json"))
-		mediaFileRepo := localfs.NewMediaRepo(filepath.Join(cfg.LocalPath, "mediacontent"))
-
-		store.View = NewViewStoreImpl(
-			artRepo,
-			userRepo,
-			mediaRepo,
-		)
-
-		store.User = NewUserStoreImpl(
-			artRepo,
-			mediaRepo,
-			mediaFileRepo,
-		)
+		store.Media = NewMediaStoreImpl(mediaRepo)
+		store.Post = NewPostStoreImpl(postRepo)
 	}
 
 	return &store, nil

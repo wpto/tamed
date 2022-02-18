@@ -1,9 +1,10 @@
-package commonroute
+package routes
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pgeowng/tamed/service"
 	"github.com/pgeowng/tamed/types"
 	"github.com/pkg/errors"
 )
@@ -25,4 +26,12 @@ func SendError(c *gin.Context, err error) {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
+}
+
+type PostRoute struct {
+	services *service.Manager
+}
+
+func NewPostRoute(services *service.Manager) *PostRoute {
+	return &PostRoute{services}
 }

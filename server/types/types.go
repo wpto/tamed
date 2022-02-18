@@ -46,12 +46,13 @@ var MimeToExt = map[string]string{
 	"video/webm": "mkv",
 }
 
-func GetExt(mime string) (string, error) {
+func GetExt(mime string) string {
 	ext, ok := MimeToExt[mime]
 	if !ok {
-		return "", errors.Wrap(ErrBadRequest, fmt.Sprintf("bad mime(%s)", mime))
+		fmt.Println(errors.Wrap(ErrBadRequest, fmt.Sprintf("bad mime(%s)", mime)))
+		return ""
 	}
-	return ext, nil
+	return ext
 }
 
 var MimeToMediaType = map[string]string{

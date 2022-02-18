@@ -1,5 +1,7 @@
 package model
 
+import "io"
+
 type MediaMeta struct {
 	Type   string `json:"type"` // ? 1 for vid 2 for img
 	Mime   string `json:"mime"` // ? removed
@@ -53,12 +55,12 @@ type User struct {
 			Preview string `json:"preview"`
 		} `json:"thumb"`
 	} `json:"profile"`
-	Social struct {
-		Arts      int `json:"arts"`
-		Followers int `json:"followers"`
-		Following int `json:"following"`
-		Views     int `json:"views"`
-	} `json:"social"`
+	// Social struct {
+	// 	Arts      int `json:"arts"`
+	// 	Followers int `json:"followers"`
+	// 	Following int `json:"following"`
+	// 	Views     int `json:"views"`
+	// } `json:"social"`
 }
 
 type SearchResponse struct {
@@ -74,4 +76,10 @@ type SearchRequest struct {
 	Count    uint64
 	Offset   uint64
 	Order    string
+}
+
+type File struct {
+	ContentLength int64
+	ContentType   string
+	Reader        io.ReadCloser
 }

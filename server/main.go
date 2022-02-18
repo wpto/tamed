@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pgeowng/tamed/routes/userroute"
-	"github.com/pgeowng/tamed/routes/viewroute"
+	"github.com/pgeowng/tamed/config"
+	"github.com/pgeowng/tamed/routes"
 	"github.com/pgeowng/tamed/service"
 	"github.com/pgeowng/tamed/store"
 	"github.com/pkg/errors"
@@ -30,18 +30,16 @@ func run() error {
 
 	router := gin.Default()
 
-	viewRoute := viewroute.NewViewRoute(services)
-	view := router.Group("/view")
+	postRoute := routes.NewPostRoute(services)
+	// userRoute := userroute.NewUserRoute(services)
+	router.Static("/media/", config.Get().MediaPath)
+	api := router.Group("/api")
 	{
-		view.GET("/art/:id", viewRoute.ViewArt)
-		view.GET("/user/:id", viewRoute.ViewUser)
-		view.GET("/search", viewRoute.Search)
-	}
-
-	userRoute := userroute.NewUserRoute(services)
-	user := router.Group("/user")
-	{
-		user.POST("/art", userRoute.CreateArt)
+		api.GET("/post/", postRoute.List)
+		api.GET("/post/:id", postRoute.Get)
+		api.POST("/post/", postRoute.Create)
+		// 	api.PATCH("/post/:id", userRoute.Modify)
+		// 	api.DELETE("/post/:id", userRoute.Delete)
 	}
 
 	router.Run(":1314")

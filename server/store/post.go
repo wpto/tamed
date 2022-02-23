@@ -63,23 +63,27 @@ func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, erro
 	filtered := []model.Post{}
 
 	for _, entry := range db {
-		skip := len(entry.Tags) == 0 && len(query.IncludeTags) > 0
-		for _, tag := range entry.Tags {
-			if len(query.ExcludeTags) != 0 &&
-				model.ContainTag(query.ExcludeTags, tag.Label) {
-				skip = true
-				break
-			}
 
-			if len(query.IncludeTags) != 0 &&
-				!model.ContainTag(query.IncludeTags, tag.Label) {
-				skip = true
-				break
-			}
-		}
-		if !skip {
+		if entry.Tags.Includes(query.IncludeTags) &&
+			entry.Tags.Excludes(query.ExcludeTags) {
 			filtered = append(filtered, entry)
 		}
+		// skip := len(entry.Tags) == 0 && len(query.IncludeTags) > 0
+		// for _, tag := range entry.Tags {
+		// 	if len(query.ExcludeTags) != 0 &&
+		// 		model.ContainTag(query.ExcludeTags, tag.Label) {
+		// 		skip = true
+		// 		break
+		// 	}
+
+		// 	if len(query.IncludeTags) != 0 &&
+		// 		!model.ContainTag(query.IncludeTags, tag.Label) {
+		// 		skip = true
+		// 		break
+		// 	}
+		// }
+		// if !skip {
+		// }
 	}
 
 	total := len(filtered)
@@ -97,14 +101,12 @@ func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, erro
 		right = total
 	}
 
-	fmt.Println(left, right)
-
 	return &model.PostList{
 		Page:  page,
 		Pages: pages,
 		Total: total,
 		Posts: filtered[left:right],
-		Tags:  []model.Tag{},
+		Tags:  model.NewTags(),
 	}, nil
 }
 func (store *PostStoreImpl) Create(postID string, post *model.Post) error {
@@ -122,26 +124,29 @@ func (store *PostStoreImpl) Create(postID string, post *model.Post) error {
 }
 
 func (store *PostStoreImpl) Modify(postID string, changes *model.PostChanges) error {
-	// prev, err := store.repo.Get(postID)
-	// if err != nil {
-	// 	return errors.Wrap(err, "poststore.modify")
-	// }
+	postBody, err := store.repo.Get(postID)
+	if err != nil {
+		return errors.Wrap(err, "poststore.modify")
+	}
 
-	// var entry model.Post
-	// err = json.Unmarshal(prev, &entry)
-	// if err != nil {
-	// 	return errors.Wrap(err, "poststore.modify")
-	// }
+	var entry model.Post
+	err = json.Unmarshal(postBody, &entry)
+	if err != nil {
+		return errors.Wrap(err, "poststore.modify")
+	}
 
-	// body, err := json.Marshal(entry)
-	// if err != nil {
-	// 	return errors.Wrap(err, "poststore.modify")
-	// }
+	entry.Tags.Include(changes.AddTags)
+	entry.Tags.Exclude(changes.RemoveTags)
 
-	// err = store.repo.Write(postID, body)
-	// if err != nil {
-	// 	return errors.Wrap(err, "poststore.modify")
-	// }
+	postBody, err = json.Marshal(entry)
+	if err != nil {
+		return errors.Wrap(err, "poststore.modify")
+	}
+
+	err = store.repo.Write(postID, postBody)
+	if err != nil {
+		return errors.Wrap(err, "poststore.modify")
+	}
 
 	return nil
 }

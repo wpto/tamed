@@ -31,14 +31,13 @@ func run() error {
 	router := gin.Default()
 
 	postRoute := routes.NewPostRoute(services)
-	// userRoute := userroute.NewUserRoute(services)
 	router.Static("/media/", config.Get().MediaPath)
 	api := router.Group("/api")
 	{
 		api.GET("/post/", postRoute.List)
 		api.GET("/post/:id", postRoute.Get)
 		api.POST("/post/", postRoute.Create)
-		// 	api.PATCH("/post/:id", userRoute.Modify)
+		api.PATCH("/post/:id", postRoute.Modify)
 		// 	api.DELETE("/post/:id", userRoute.Delete)
 	}
 

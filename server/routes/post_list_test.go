@@ -25,13 +25,16 @@ func TestList(t *testing.T) {
 		{tags: "hello world -easy",
 			err: false,
 			check: func(res *model.PostQuery) bool {
-				return model.ContainTag(res.IncludeTags, "hello") && model.ContainTag(res.IncludeTags, "world") && model.ContainTag(res.ExcludeTags, "easy") && len(res.IncludeTags) == 2 && len(res.ExcludeTags) == 1
+				return res.IncludeTags.Includes(model.NewTags("hello", "world")) &&
+					res.ExcludeTags.Includes(model.NewTags("easy")) &&
+					res.IncludeTags.Len() == 2 &&
+					res.ExcludeTags.Len() == 1
 			},
 		},
 		{tags: "           ",
 			err: false,
 			check: func(res *model.PostQuery) bool {
-				return len(res.IncludeTags) == 0 && len(res.ExcludeTags) == 0
+				return res.IncludeTags.Len() == 0 && res.ExcludeTags.Len() == 0
 			},
 		},
 	}

@@ -72,7 +72,7 @@ func (srv *PostSrv) Create(files []*multipart.FileHeader) ([]model.Post, error) 
 		obj := model.Post{
 			PostID:     id,
 			CreateTime: commonsrv.TimeNow(),
-			Tags:       []model.Tag{},
+			Tags:       model.NewTags(),
 			Link:       filePath,
 		}
 

@@ -7,6 +7,18 @@ import (
 	"github.com/pgeowng/tamed/model"
 )
 
+type ModifyOpts struct {
+	AddTags    *model.Tags `json:"add_tags"`
+	RemoveTags *model.Tags `json:"rm_tags"`
+}
+
+func (opts *ModifyOpts) PostChanges() *model.PostChanges {
+	return &model.PostChanges{
+		AddTags:    opts.AddTags,
+		RemoveTags: opts.RemoveTags,
+	}
+}
+
 func (r *PostRoute) Modify(c *gin.Context) {
 	postID := c.Param("id")
 
@@ -14,30 +26,19 @@ func (r *PostRoute) Modify(c *gin.Context) {
 		c.String(http.StatusMethodNotAllowed, "empty post id")
 	}
 
-	addTags, ok := c.GetPostFormArray("add_tags")
-	if !ok {
-		addTags = []string{}
+	var opts ModifyOpts
+	if err := c.ShouldBindJSON(&opts); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	rmTags, ok := c.GetPostFormArray("rm_tags")
-	if !ok {
-		rmTags = []string{}
+	if opts.AddTags == nil {
+		opts.AddTags = model.NewTags()
+	}
+	if opts.RemoveTags == nil {
+		opts.RemoveTags = model.NewTags()
 	}
 
-	req := &model.PostChanges{
-		AddTags:    []model.Tag{},
-		RemoveTags: []model.Tag{},
-	}
-
-	for _, tag := range addTags {
-		req.AddTags = append(req.AddTags, model.NewTag(tag))
-	}
-
-	for _, tag := range rmTags {
-		req.RemoveTags = append(req.RemoveTags, model.NewTag(tag))
-	}
-
-	err := r.services.Post.Modify(postID, req)
+	err := r.services.Post.Modify(postID, opts.PostChanges())
 	if err != nil {
 		SendError(c, err)
 		return

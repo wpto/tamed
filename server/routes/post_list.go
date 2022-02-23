@@ -69,16 +69,16 @@ func ListArgs(postIDStr, orderStr, limitStr, offsetStr, tagsStr string) (*model.
 		offset = int(offset64)
 	}
 
-	incTags := []model.Tag{}
-	excTags := []model.Tag{}
+	incTags := []string{}
+	excTags := []string{}
 	if len(tagsStr) > 0 {
 		tagsList := strings.Split(tagsStr, " ")
 		for _, tag := range tagsList {
 			if len(tag) > 0 {
 				if strings.HasPrefix(tag, "-") {
-					excTags = append(excTags, model.NewTag(strings.TrimPrefix(tag, "-")))
+					excTags = append(excTags, strings.TrimPrefix(tag, "-"))
 				} else {
-					incTags = append(incTags, model.NewTag(tag))
+					incTags = append(incTags, tag)
 				}
 			}
 		}
@@ -87,8 +87,8 @@ func ListArgs(postIDStr, orderStr, limitStr, offsetStr, tagsStr string) (*model.
 	return &model.PostQuery{
 		PostID:      postID,
 		Order:       order,
-		IncludeTags: incTags,
-		ExcludeTags: excTags,
+		IncludeTags: model.NewTags(incTags...),
+		ExcludeTags: model.NewTags(excTags...),
 		Limit:       limit,
 		Offset:      offset,
 	}, nil

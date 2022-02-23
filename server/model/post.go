@@ -1,23 +1,15 @@
 package model
 
-type Tag struct {
-	Label string
-}
-
-func NewTag(label string) Tag {
-	return Tag{Label: label}
-}
-
 type Post struct {
 	PostID     string
 	CreateTime string
-	Tags       []Tag
+	Tags       *Tags
 	Link       string
 }
 
 type PostChanges struct {
-	AddTags    []Tag
-	RemoveTags []Tag
+	AddTags    *Tags
+	RemoveTags *Tags
 }
 
 type Ordering int64
@@ -33,8 +25,8 @@ var OrderingMap = map[string]Ordering{
 type PostQuery struct {
 	PostID      *string
 	Order       Ordering
-	IncludeTags []Tag
-	ExcludeTags []Tag
+	IncludeTags *Tags
+	ExcludeTags *Tags
 	Limit       int
 	Offset      int
 }
@@ -44,14 +36,5 @@ type PostList struct {
 	Pages int    `json:"pages"`
 	Total int    `json:"total"`
 	Posts []Post `json:"posts"`
-	Tags  []Tag  `json:"tags"`
-}
-
-func ContainTag(list []Tag, label string) bool {
-	for _, tag := range list {
-		if tag.Label == label {
-			return true
-		}
-	}
-	return false
+	Tags  *Tags  `json:"tags"`
 }

@@ -9,33 +9,6 @@ import (
 	"github.com/pgeowng/tamed/store"
 )
 
-// type MediaFileRes interface {
-// 	ContentType() string
-// 	ContentLength() int64
-// 	Reader() io.Reader
-// }
-
-// type MediaService interface {
-// 	Serve(mediaID string, qualityTag string) (*MediaFileRes, error)
-// }
-
-// type ViewService interface {
-// 	ViewArt(artID string) (*model.Art, error)
-// 	// ViewRecent()
-// 	ViewUser(userName string) (*model.User, error)
-// 	// ViewTag()
-// 	Search() (*model.SearchResponse, error)
-// 	ViewMedia(mediaID string) (*model.File, error)
-// }
-
-// type UserService interface {
-// 	Upload(fileHeader *multipart.FileHeader) (*model.Media, error)
-// 	CreateArt(userName string, media []model.Media) (*model.Art, error)
-// 	// DeleteArt()
-// 	// AddTag()
-// 	// LookFavorites()
-// }
-
 type PostService interface {
 	Get(postID string) (*model.Post, error)
 	List(query *model.PostQuery) (*model.PostList, error)
@@ -54,9 +27,6 @@ func NewManager(store *store.Store) (*Manager, error) {
 	} else {
 		return &Manager{
 			Post: postsrv.NewPostSrv(store),
-			// Media: mediasrv.NewMediaSrv(store),
-			// View: viewsrv.NewViewSrv(store),
-			// User: usersrv.NewUserSrv(store),
 		}, nil
 	}
 }

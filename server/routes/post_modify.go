@@ -14,12 +14,12 @@ func (r *PostRoute) Modify(c *gin.Context) {
 		c.String(http.StatusMethodNotAllowed, "empty post id")
 	}
 
-	addTags, ok := c.GetPostFormArray("add_tag")
+	addTags, ok := c.GetPostFormArray("add_tags")
 	if !ok {
 		addTags = []string{}
 	}
 
-	rmTags, ok := c.GetPostFormArray("rm_tag")
+	rmTags, ok := c.GetPostFormArray("rm_tags")
 	if !ok {
 		rmTags = []string{}
 	}

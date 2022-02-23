@@ -14,11 +14,11 @@ func (r *PostRoute) Get(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	}
 
-	_, err := r.services.Post.Get(postID)
+	result, err := r.services.Post.Get(postID)
 	if err != nil {
 		SendError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, result)
 }

@@ -17,8 +17,18 @@ func NewPostStoreImpl(repo FileRepo) *PostStoreImpl {
 }
 
 func (store *PostStoreImpl) Get(postID string) (*model.Post, error) {
-	fmt.Println("poststore.get")
-	return nil, nil
+	prev, err := store.repo.Get(postID)
+	if err != nil {
+		return nil, errors.Wrap(err, "poststore.get")
+	}
+
+	var entry model.Post
+	err = json.Unmarshal(prev, &entry)
+	if err != nil {
+		return nil, errors.Wrap(err, "poststore.get")
+	}
+
+	return &entry, nil
 }
 
 func (store *PostStoreImpl) Query(query *model.PostQuery) (*PostList, error) {

@@ -107,3 +107,20 @@ func (repo *FileRepo) Write(id string, encodedJSON []byte) error {
 
 	return nil
 }
+func (repo *FileRepo) Delete(id string) error {
+	db := repo.ReadDB()
+
+	_, ok := db[id]
+	if !ok {
+		return errors.Wrap(types.ErrNotFound, "filerepo.delete")
+	}
+
+	delete(db, id)
+
+	err := repo.WriteDB(db)
+	if err != nil {
+		return errors.Wrap(err, "filerepo.delete")
+	}
+
+	return nil
+}

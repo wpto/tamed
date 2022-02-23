@@ -81,6 +81,8 @@ func (srv *PostSrv) Create(files []*multipart.FileHeader) ([]model.Post, error) 
 			errs = append(errs, errors.Wrap(err, "postsrv.create("+fileName+")"))
 			continue
 		}
+
+		result = append(result, obj)
 	}
 
 	return result, nil

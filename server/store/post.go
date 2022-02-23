@@ -2,7 +2,6 @@ package store
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 
 	"github.com/pgeowng/tamed/model"
@@ -63,27 +62,10 @@ func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, erro
 	filtered := []model.Post{}
 
 	for _, entry := range db {
-
 		if entry.Tags.Includes(query.IncludeTags) &&
 			entry.Tags.Excludes(query.ExcludeTags) {
 			filtered = append(filtered, entry)
 		}
-		// skip := len(entry.Tags) == 0 && len(query.IncludeTags) > 0
-		// for _, tag := range entry.Tags {
-		// 	if len(query.ExcludeTags) != 0 &&
-		// 		model.ContainTag(query.ExcludeTags, tag.Label) {
-		// 		skip = true
-		// 		break
-		// 	}
-
-		// 	if len(query.IncludeTags) != 0 &&
-		// 		!model.ContainTag(query.IncludeTags, tag.Label) {
-		// 		skip = true
-		// 		break
-		// 	}
-		// }
-		// if !skip {
-		// }
 	}
 
 	total := len(filtered)
@@ -152,6 +134,9 @@ func (store *PostStoreImpl) Modify(postID string, changes *model.PostChanges) er
 }
 
 func (store *PostStoreImpl) Delete(postID string) error {
-	fmt.Println("poststore.delete")
+	err := store.repo.Delete(postID)
+	if err != nil {
+		return errors.Wrap(err, "poststore.delete")
+	}
 	return nil
 }

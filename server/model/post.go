@@ -1,10 +1,10 @@
 package model
 
 type Post struct {
-	PostID     string
-	CreateTime string
-	Tags       *Tags
-	Link       string
+	PostID     string `json:"id"`
+	CreateTime string `json:"ctime"`
+	Tags       *Tags  `json:"tags"`
+	Link       string `json:"link"`
 }
 
 type PostChanges struct {

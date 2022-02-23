@@ -9,9 +9,8 @@ import (
 func (r *PostRoute) Get(c *gin.Context) {
 	postID := c.Param("id")
 
-	if len(postID) < 1 {
-		// test
-		c.Redirect(http.StatusMovedPermanently, "/")
+	if len(postID) == 0 {
+		c.String(http.StatusMethodNotAllowed, "empty post id")
 	}
 
 	result, err := r.services.Post.Get(postID)

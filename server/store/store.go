@@ -10,6 +10,7 @@ import (
 
 type FileRepo interface {
 	Create(id string, encodedJSON []byte) error
+	Delete(id string) error
 	Write(id string, encodedJSON []byte) error
 	Get(id string) ([]byte, error)
 	All() ([]byte, error)

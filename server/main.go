@@ -34,11 +34,11 @@ func run() error {
 	router.Static("/media/", config.Get().MediaPath)
 	api := router.Group("/api")
 	{
-		api.GET("/post/", postRoute.List)
-		api.GET("/post/:id", postRoute.Get)
-		api.POST("/post/", postRoute.Create)
-		api.PATCH("/post/:id", postRoute.Modify)
-		// 	api.DELETE("/post/:id", userRoute.Delete)
+		api.GET("/posts", postRoute.List)
+		api.GET("/posts/:id", postRoute.Get)
+		api.POST("/posts", postRoute.Create)
+		api.PATCH("/posts/:id", postRoute.Modify)
+		api.DELETE("/posts/:id", postRoute.Delete)
 	}
 
 	router.Run(":1314")

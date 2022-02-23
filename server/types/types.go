@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	ErrNotFound       = errors.New("resource not found")
+	ErrNotFound       = errors.New("not found")
 	ErrBadRequest     = errors.New("bad request")
 	ErrNotImplemented = errors.New("not implemented")
+	ErrNotAllowed     = errors.New("not allowed")
 )
 
 var AcceptedMime = map[string]bool{

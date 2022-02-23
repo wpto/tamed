@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pgeowng/tamed/types"
 )
 
 func (r *PostRoute) Get(c *gin.Context) {
 	postID := c.Param("id")
 
 	if len(postID) == 0 {
-		c.String(http.StatusMethodNotAllowed, "empty post id")
+		SendError(c, types.ErrNotAllowed)
 	}
 
 	result, err := r.services.Post.Get(postID)

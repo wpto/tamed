@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pgeowng/tamed/model"
+	"github.com/pgeowng/tamed/types"
 )
 
 type ModifyOpts struct {
@@ -23,12 +24,14 @@ func (r *PostRoute) Modify(c *gin.Context) {
 	postID := c.Param("id")
 
 	if len(postID) == 0 {
-		c.String(http.StatusMethodNotAllowed, "empty post id")
+		SendError(c, types.ErrNotAllowed)
+		return
 	}
 
 	var opts ModifyOpts
 	if err := c.ShouldBindJSON(&opts); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		SendError(c, err)
+		return
 	}
 
 	if opts.AddTags == nil {
@@ -44,5 +47,5 @@ func (r *PostRoute) Modify(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "changed")
+	c.JSON(http.StatusOK, gin.H{"ok": "changed"})
 }

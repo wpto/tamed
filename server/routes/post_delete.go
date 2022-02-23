@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pgeowng/tamed/types"
 )
 
 func (r *PostRoute) Delete(c *gin.Context) {
 	postID := c.Param("id")
 
 	if len(postID) == 0 {
-		c.String(http.StatusMethodNotAllowed, "empty post id")
+		SendError(c, types.ErrNotAllowed)
 	}
 
 	err := r.services.Post.Delete(postID)
@@ -19,5 +20,5 @@ func (r *PostRoute) Delete(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "deleted")
+	c.JSON(http.StatusOK, gin.H{"ok": "deleted"})
 }

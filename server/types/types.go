@@ -85,13 +85,3 @@ type GetPicOpts struct {
 	ContentType string
 	Width       int
 }
-
-type Ordering int64
-
-const (
-	Trending Ordering = 0
-)
-
-var OrderingMap = map[string]Ordering{
-	"trending": Trending,
-}

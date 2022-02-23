@@ -4,9 +4,8 @@ type Tag struct {
 	Label string
 }
 
-type TagKey struct {
-	Tag
-	Exclude bool
+func NewTag(label string) Tag {
+	return Tag{Label: label}
 }
 
 type Post struct {
@@ -21,8 +20,21 @@ type PostChanges struct {
 	RemoveTags []Tag
 }
 
+type Ordering int64
+
+const (
+	Recent Ordering = 0
+)
+
+var OrderingMap = map[string]Ordering{
+	"recent": Recent,
+}
+
 type PostQuery struct {
-	PostID *string
-	Tags   []TagKey
-	Order  *string
+	PostID      *string
+	Order       Ordering
+	IncludeTags []Tag
+	ExcludeTags []Tag
+	Limit       int
+	Offset      int
 }

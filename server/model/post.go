@@ -17,16 +17,12 @@ type Post struct {
 }
 
 type PostChanges struct {
-	Tags []TagKey
+	AddTags    []Tag
+	RemoveTags []Tag
 }
 
 type PostQuery struct {
 	PostID *string
 	Tags   []TagKey
 	Order  *string
-}
-
-type PostList struct {
-	Posts []Post
-	Tags  []Tag
 }

@@ -1,22 +1,15 @@
 package postsrv
 
 import (
-  "fmt"
-
   "github.com/pgeowng/tamed/model"
+  "github.com/pkg/errors"
 )
 
 func (p *PostSrv) Get(postID string) (*model.Post, error) {
-  // result, err = srv.store.View.GetArt(artID)
-  // if err != nil {
-  //   return nil, errors.Wrap(err, "srv.view.art")
-  // }
+  result, err := p.store.Post.Get(postID)
+  if err != nil {
+    return nil, errors.Wrap(err, "postsrv.getpost")
+  }
 
-  // if result == nil {
-  //   return nil, errors.Wrap(types.ErrNotFound, fmt.Sprintf("srv.view.art: Art '%s' not found!", artID))
-  // }
-
-  // return
-  fmt.Printf("postsrv.get")
-  return nil, nil
+  return result, nil
 }

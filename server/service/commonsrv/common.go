@@ -6,8 +6,17 @@ import (
 	"time"
 
 	"github.com/jxskiss/base62"
+	"github.com/pgeowng/tamed/model"
 	"github.com/sony/sonyflake"
 )
+
+type ListResponse struct {
+	Page  int          `json:"page"`
+	Pages int          `json:"pages"`
+	Total int          `json:"total"`
+	Posts []model.Post `json:"posts"`
+	Tags  []model.Tag  `json:"tags"`
+}
 
 var lastID uint64 = 0
 var machineID uint16 = 0

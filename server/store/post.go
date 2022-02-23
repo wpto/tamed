@@ -21,7 +21,7 @@ func (store *PostStoreImpl) Get(postID string) (*model.Post, error) {
 	return nil, nil
 }
 
-func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, error) {
+func (store *PostStoreImpl) Query(query *model.PostQuery) (*PostList, error) {
 	fmt.Println("poststore.query")
 	return nil, nil
 }

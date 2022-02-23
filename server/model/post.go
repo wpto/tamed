@@ -38,3 +38,20 @@ type PostQuery struct {
 	Limit       int
 	Offset      int
 }
+
+type PostList struct {
+	Page  int    `json:"page"`
+	Pages int    `json:"pages"`
+	Total int    `json:"total"`
+	Posts []Post `json:"posts"`
+	Tags  []Tag  `json:"tags"`
+}
+
+func ContainTag(list []Tag, label string) bool {
+	for _, tag := range list {
+		if tag.Label == label {
+			return true
+		}
+	}
+	return false
+}

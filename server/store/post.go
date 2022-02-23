@@ -3,6 +3,7 @@ package store
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/pgeowng/tamed/model"
 	"github.com/pkg/errors"
@@ -31,10 +32,78 @@ func (store *PostStoreImpl) Get(postID string) (*model.Post, error) {
 	return &entry, nil
 }
 
-func (store *PostStoreImpl) Query(query *model.PostQuery) (*PostList, error) {
-	fmt.Println("poststore.query")
-	return &PostList{
-		Posts: []model.Post{},
+func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, error) {
+
+	if query.PostID != nil {
+		post, err := store.Get(*query.PostID)
+		if err != nil {
+			return nil, errors.Wrap(err, "poststore.query")
+		}
+
+		return &model.PostList{
+			Page:  1,
+			Pages: 1,
+			Total: 1,
+			Posts: []model.Post{*post},
+			Tags:  post.Tags,
+		}, nil
+	}
+
+	dbText, err := store.repo.All()
+	if err != nil {
+		return nil, errors.Wrap(err, "poststore.query")
+	}
+
+	var db []model.Post
+	err = json.Unmarshal(dbText, &db)
+	if err != nil {
+		return nil, errors.Wrap(err, "poststore.query")
+	}
+
+	filtered := []model.Post{}
+
+	for _, entry := range db {
+		skip := len(entry.Tags) == 0 && len(query.IncludeTags) > 0
+		for _, tag := range entry.Tags {
+			if len(query.ExcludeTags) != 0 &&
+				model.ContainTag(query.ExcludeTags, tag.Label) {
+				skip = true
+				break
+			}
+
+			if len(query.IncludeTags) != 0 &&
+				!model.ContainTag(query.IncludeTags, tag.Label) {
+				skip = true
+				break
+			}
+		}
+		if !skip {
+			filtered = append(filtered, entry)
+		}
+	}
+
+	total := len(filtered)
+	pages := int(math.Ceil(float64(total) / float64(query.Limit)))
+
+	left := query.Offset * query.Limit
+	page := int(math.Floor(float64(left) / float64(query.Limit)))
+	if left >= total {
+		left = total
+		page = pages
+	}
+
+	right := left + query.Limit
+	if right > total {
+		right = total
+	}
+
+	fmt.Println(left, right)
+
+	return &model.PostList{
+		Page:  page,
+		Pages: pages,
+		Total: total,
+		Posts: filtered[left:right],
 		Tags:  []model.Tag{},
 	}, nil
 }

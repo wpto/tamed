@@ -6,15 +6,6 @@ import (
 	"github.com/pgeowng/tamed/model"
 )
 
-func containTag(list []model.Tag, label string) bool {
-	for _, tag := range list {
-		if tag.Label == label {
-			return true
-		}
-	}
-	return false
-}
-
 func TestList(t *testing.T) {
 	cases := []struct {
 		postid string
@@ -34,7 +25,7 @@ func TestList(t *testing.T) {
 		{tags: "hello world -easy",
 			err: false,
 			check: func(res *model.PostQuery) bool {
-				return containTag(res.IncludeTags, "hello") && containTag(res.IncludeTags, "world") && containTag(res.ExcludeTags, "easy") && len(res.IncludeTags) == 2 && len(res.ExcludeTags) == 1
+				return model.ContainTag(res.IncludeTags, "hello") && model.ContainTag(res.IncludeTags, "world") && model.ContainTag(res.ExcludeTags, "easy") && len(res.IncludeTags) == 2 && len(res.ExcludeTags) == 1
 			},
 		},
 		{tags: "           ",

@@ -8,11 +8,6 @@ import (
 	"github.com/pgeowng/tamed/store/localfs"
 )
 
-type PostList struct {
-	Posts []model.Post
-	Tags  []model.Tag
-}
-
 type FileRepo interface {
 	Create(id string, encodedJSON []byte) error
 	Write(id string, encodedJSON []byte) error
@@ -30,7 +25,7 @@ type MediaStore interface {
 
 type PostStore interface {
 	Get(postID string) (*model.Post, error)
-	Query(query *model.PostQuery) (*PostList, error)
+	Query(query *model.PostQuery) (*model.PostList, error)
 	Create(postID string, post *model.Post) error
 	Modify(postID string, changes *model.PostChanges) error
 	Delete(postID string) error

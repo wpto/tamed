@@ -5,14 +5,13 @@ import (
 	"mime/multipart"
 
 	"github.com/pgeowng/tamed/model"
-	"github.com/pgeowng/tamed/service/commonsrv"
 	"github.com/pgeowng/tamed/service/postsrv"
 	"github.com/pgeowng/tamed/store"
 )
 
 type PostService interface {
 	Get(postID string) (*model.Post, error)
-	List(query *model.PostQuery) (*commonsrv.ListResponse, error)
+	List(query *model.PostQuery) (*model.PostList, error)
 	Modify(postID string, changes *model.PostChanges) error
 	Delete(postID string) error
 	Create(files []*multipart.FileHeader) ([]model.Post, error)

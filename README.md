@@ -1,4 +1,6 @@
-# tamed - imageboard engine
+# tamed
+
+Imageboard engine
 
 ## implemented
 

@@ -42,7 +42,12 @@ export const usePosts = () => {
     }
 
     if (data != null) {
-      setPosts(data.posts.map((e) => ({ link: `/media/${e.link}` })))
+      setPosts(
+        data.posts.map((e) => ({
+          thumbUrl: `/media/${e.link}`,
+          link: `/post/${e.id}`,
+        }))
+      )
     }
 
     setLoaded(true)

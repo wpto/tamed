@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './PostList.module.css'
+import { Link } from 'react-router-dom'
 import { PostPreview } from '../../types/render'
 
 interface Props {
@@ -11,9 +12,11 @@ export const PostList: React.FC<Props> = ({ posts }) => {
     <div className={styles.list}>
       <div className={styles.container}>
         {posts.map((p) => (
-          <div className={styles.link}>
-            <img className={styles.thumb} src={p.link} />
-          </div>
+          <Link to={p.link}>
+            <div className={styles.link}>
+              <img className={styles.thumb} src={p.thumbUrl} />
+            </div>
+          </Link>
         ))}
       </div>
     </div>

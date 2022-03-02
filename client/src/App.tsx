@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import styles from './App.module.css'
 import { Dropzone } from './components/Dropzone/Dropzone'
@@ -11,6 +11,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetchPosts()
   }, [])
+
+  const dropUpdate = useCallback(() => {
+    fetchPosts()
+  }, [])
+
   return (
     <div className={styles.app}>
       <header className={styles.header}>
@@ -26,7 +31,7 @@ export const App: React.FC = () => {
       <div className={styles.content}>
         <div className={styles.leftBar}>
           <div className={styles.upload}>
-            <Dropzone />
+            <Dropzone onUpdate={dropUpdate} />
           </div>
           <div className={styles.search}>
             <h5> Search </h5>

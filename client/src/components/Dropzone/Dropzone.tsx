@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useUpload } from '../../hooks/upload'
 import styles from './Dropzone.module.css'
 
-export const Dropzone: React.FC = () => {
+interface Props {
+  onUpdate: () => void
+}
+
+export const Dropzone: React.FC<Props> = ({ onUpdate }) => {
+  const { status, upload } = useUpload()
   const [advancedUpload, setAdvancedUpload] = useState(false)
   const [isDragOver, setDragOver] = useState(false)
   useEffect(() => {
@@ -31,12 +37,16 @@ export const Dropzone: React.FC = () => {
     setDragOver(false)
   }, [])
 
-  const drop: React.DragEventHandler = useCallback((e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.files
-    setDragOver(false)
-  }, [])
+  const drop: React.DragEventHandler = useCallback(
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      upload(e.dataTransfer.files)
+      onUpdate()
+      setDragOver(false)
+    },
+    [upload, onUpdate]
+  )
 
   return (
     <form
@@ -72,7 +82,7 @@ export const Dropzone: React.FC = () => {
           .
         </label>
       </div>
-      <div className={styles.messageHidden}>Uploading…</div>
+      <div className={status == null ? styles.messageHidden : ''}>{status}</div>
     </form>
   )
 }

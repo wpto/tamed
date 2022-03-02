@@ -12,10 +12,8 @@ export const PostList: React.FC<Props> = ({ posts }) => {
     <div className={styles.list}>
       <div className={styles.container}>
         {posts.map((p) => (
-          <Link to={p.link}>
-            <div className={styles.link}>
-              <img className={styles.thumb} src={p.thumbUrl} />
-            </div>
+          <Link to={p.link} className={styles.link}>
+            <img className={styles.thumb} src={p.thumbUrl} />
           </Link>
         ))}
       </div>

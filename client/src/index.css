@@ -11,9 +11,29 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  color: #6266b7;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  font-size: 1.2em;
+  color: #6266b7;
+  /*text-decoration: none;*/
+  font-weight: 600;
+}
+
+h5 {
+  margin: 0;
+  font-size: 1.1em;
 }

@@ -12,13 +12,13 @@
 
 .link {
   width: 250px;
-  height: 250px;
-  display: flex;
+  /*height: 250px;*/
+  display: inline-flex;
   justify-content: center;
   align-items: center;
 }
 
 .thumb {
   max-width: 250px;
-  max-height: 250px;
+  /*max-height: 250px;*/
 }

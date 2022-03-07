@@ -33,8 +33,6 @@ type PostStore interface {
 }
 
 type Store struct {
-	// View ViewStore
-	// User UserStore
 	Media MediaStore
 	Post  PostStore
 }

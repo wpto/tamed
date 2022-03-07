@@ -6,8 +6,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// type Tag string
-
 type Tags struct {
 	labels map[string]bool
 }

@@ -41,14 +41,6 @@ type PostRoute struct {
 	services *service.Manager
 }
 
-type PageRoute struct {
-	services *service.Manager
-}
-
 func NewPostRoute(services *service.Manager) *PostRoute {
 	return &PostRoute{services}
-}
-
-func NewPageRoute(services *service.Manager) *PageRoute {
-	return &PageRoute{services}
 }

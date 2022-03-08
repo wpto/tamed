@@ -150,7 +150,8 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 	var tags []Tags
 	err = db.NewSelect().
 		Model(&tags).
-		Where("? IN ?", bun.Ident("post_id"), bun.In(postsId)).
+		Column("tag").
+		Where("? IN (?)", bun.Ident("post_id"), bun.In(postsId)).
 		Group("tag").
 		Scan(ctx)
 

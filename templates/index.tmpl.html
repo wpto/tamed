@@ -1,0 +1,53 @@
+<html>
+  {{template "header.tmpl.html"}}
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="bd-example">
+            <div class="mb-3">
+              <label for="uploadInput" class="form-label"
+                >Multiple file upload</label
+              >
+              <input
+                type="file"
+                class="form-control"
+                id="uploadInput"
+                multiple
+              />
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button class="btn btn-primary me-md-2" type="submit">
+                Upload
+              </button>
+            </div>
+          </div>
+          <div class="bd-example">
+            <div class="mb-3">
+              <label for="searchInput" class="form-label"
+                >Search</label
+              >
+              <input
+                type="search"
+                class="form-control"
+                id="searchInput"
+                multiple
+              />
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button class="btn btn-primary me-md-2" type="search" id="searchButton">
+                Search
+              </button>
+            </div>
+            <div id="searchTagList"></div>
+          </div>
+        </div>
+        <div class="col-md-4" id="fileList">
+          <div id="searchTags"></div>
+          <div id="searchFiles"></div>
+        </div>
+      </div>
+    </div>
+    <script src="/static/main.js"></script>
+  </body>
+</html>

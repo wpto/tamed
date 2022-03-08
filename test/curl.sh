@@ -191,3 +191,11 @@ test_tag_has "$ID" '["there"]'
 test_delete "$ID"
 echo "modify success"
 
+test_upload_two
+test_upload_two
+test_upload_two
+test_upload_two
+test_upload_two
+test_upload_two
+test_upload_two
+test_upload_two

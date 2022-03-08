@@ -6,6 +6,7 @@ import (
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
 	"github.com/pgeowng/tamed/store/localfs"
+	"github.com/pgeowng/tamed/store/pg"
 )
 
 type FileRepo interface {
@@ -42,12 +43,21 @@ func New() (*Store, error) {
 
 	var store Store
 
-	if cfg.LocalPath != "" {
-		mediaRepo := localfs.NewMediaRepo(config.Get().MediaPath)
-		postRepo := localfs.NewFileRepo(config.Get().PostDBPath)
+	if cfg.FsLocalPath != "" {
+		mediaRepo := localfs.NewMediaRepo(config.Get().FsMediaPath)
+		store.Media = localfs.NewMediaStore(mediaRepo)
 
-		store.Media = NewMediaStoreImpl(mediaRepo)
-		store.Post = NewPostStoreImpl(postRepo)
+		if cfg.PgUrl != "" {
+			db, err := pg.Dial()
+			if err != nil {
+				panic(err)
+			}
+			store.Post = db
+		} else {
+			postRepo := localfs.NewFileRepo(config.Get().FsPostDBPath)
+
+			store.Post = localfs.NewPostStore(postRepo)
+		}
 	}
 
 	return &store, nil

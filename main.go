@@ -30,12 +30,8 @@ func run() error {
 
 	router := gin.Default()
 
-	router.LoadHTMLGlob("routes/templates/*")
-	pageRoute := routes.NewPageRoute(services)
-	router.GET("/", pageRoute.List)
-
 	postRoute := routes.NewPostRoute(services)
-	router.Static("/media/", config.Get().MediaPath)
+	router.Static("/media/", config.Get().FsMediaPath)
 	api := router.Group("/api")
 	{
 		api.GET("/posts", postRoute.List)

@@ -1,4 +1,4 @@
-package store
+package localfs
 
 import (
 	"encoding/json"
@@ -8,15 +8,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-type PostStoreImpl struct {
-	repo FileRepo
+type PostStore struct {
+	repo *FileRepo
 }
 
-func NewPostStoreImpl(repo FileRepo) *PostStoreImpl {
-	return &PostStoreImpl{repo}
+func NewPostStore(repo *FileRepo) *PostStore {
+	return &PostStore{repo}
 }
 
-func (store *PostStoreImpl) Get(postID string) (*model.Post, error) {
+func (store *PostStore) Get(postID string) (*model.Post, error) {
 	prev, err := store.repo.Get(postID)
 	if err != nil {
 		return nil, errors.Wrap(err, "poststore.get")
@@ -31,7 +31,7 @@ func (store *PostStoreImpl) Get(postID string) (*model.Post, error) {
 	return &entry, nil
 }
 
-func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, error) {
+func (store *PostStore) Query(query *model.PostQuery) (*model.PostList, error) {
 
 	if query.PostID != nil {
 		post, err := store.Get(*query.PostID)
@@ -91,7 +91,7 @@ func (store *PostStoreImpl) Query(query *model.PostQuery) (*model.PostList, erro
 		Tags:  model.NewTags(),
 	}, nil
 }
-func (store *PostStoreImpl) Create(postID string, post *model.Post) error {
+func (store *PostStore) Create(postID string, post *model.Post) error {
 	body, err := json.Marshal(*post)
 	if err != nil {
 		return errors.Wrap(err, "poststore.create.marshal")
@@ -105,7 +105,7 @@ func (store *PostStoreImpl) Create(postID string, post *model.Post) error {
 	return nil
 }
 
-func (store *PostStoreImpl) Modify(postID string, changes *model.PostChanges) error {
+func (store *PostStore) Modify(postID string, changes *model.PostChanges) error {
 	postBody, err := store.repo.Get(postID)
 	if err != nil {
 		return errors.Wrap(err, "poststore.modify")
@@ -133,7 +133,7 @@ func (store *PostStoreImpl) Modify(postID string, changes *model.PostChanges) er
 	return nil
 }
 
-func (store *PostStoreImpl) Delete(postID string) error {
+func (store *PostStore) Delete(postID string) error {
 	err := store.repo.Delete(postID)
 	if err != nil {
 		return errors.Wrap(err, "poststore.delete")

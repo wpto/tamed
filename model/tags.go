@@ -82,3 +82,11 @@ func (t *Tags) Exclude(other *Tags) {
 		delete(t.labels, tag)
 	}
 }
+
+func (t *Tags) Slice() []string {
+	result := make([]string, 0, len(t.labels))
+	for key := range t.labels {
+		result = append(result, key)
+	}
+	return result
+}

@@ -3,6 +3,7 @@ package pg
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/pgeowng/tamed/config"
 	"github.com/pgeowng/tamed/model"
@@ -113,21 +114,52 @@ func (db *DB) Get(postID string) (*model.Post, error) {
 		return nil, errors.Wrap(types.ErrNotFound, "post.pg.get")
 	}
 
+	result := p.FromDB()
+	result.Tags = model.NewTags(db.getTags(postID)...)
+
+	return result, nil
+}
+
+func (db *DB) getTags(postID string) []string {
+	ctx := context.Background()
+
 	var tags []Tags
-	err = db.NewSelect().
+	err := db.NewSelect().
 		Model(&tags).
 		Column("tag").
 		Where("? = ?", bun.Ident("post_id"), postID).
 		Group("tag").
+		Order("tag ASC").
 		Scan(ctx)
+
+	if err != nil {
+		panic(err)
+	}
 
 	tagStrings := make([]string, 0, len(tags))
 	for _, tag := range tags {
 		tagStrings = append(tagStrings, tag.Tag)
 	}
+	return tagStrings
+}
 
-	result := p.FromDB()
-	result.Tags = model.NewTags(tagStrings...)
+func (db *DB) containTags(ctx context.Context, list []string) ([]string, error) {
+
+	var tags []Tags
+	err := db.NewSelect().
+		Model(&tags).
+		Column("post_id").
+		Where("? IN (?)", bun.Ident("tag"), bun.In(list)).
+		Group("post_id").
+		Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		result = append(result, tag.PostID)
+	}
 
 	return result, nil
 }
@@ -136,8 +168,43 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 
 	ctx := context.Background()
 
+	fmt.Println(query)
+
+	// isTagFilter := query.IncludeTags.Len() > 0 || query.ExcludeTags.Len() > 0
+
+	var excSQL *bun.SelectQuery
+	if query.ExcludeTags.Len() > 0 {
+		excSQL = db.NewSelect().
+			Model((*Tags)(nil)).
+			Column("post_id").
+			Where("? IN (?)", bun.Ident("tag"), bun.In(query.ExcludeTags.Slice())).
+			Group("post_id")
+	}
+
 	var postsModel []Post
-	err := db.NewSelect().Model(&postsModel).Offset(query.Offset).Limit(query.Limit).Scan(ctx)
+	postSQL := db.NewSelect().
+		Model(&postsModel)
+
+	if query.IncludeTags.Len() > 0 {
+		postSQL = postSQL.
+			Table("tags").
+			Where("p.post_id = tags.post_id").
+			Where("? IN (?)", bun.Ident("tags.tag"), bun.In(query.IncludeTags.Slice()))
+	}
+	if query.ExcludeTags.Len() > 0 {
+		postSQL = postSQL.Where("? NOT IN (?)", bun.Ident("p.post_id"), excSQL)
+	}
+
+	if query.IncludeTags.Len() > 0 {
+		postSQL = postSQL.Group("p.post_id").
+			Having("COUNT(?) = ?", bun.Ident("p.post_id"), query.IncludeTags.Len())
+	}
+
+	postSQL = postSQL.Offset(query.Offset).
+		Limit(query.Limit).
+		Order("p.post_id DESC")
+
+	err := postSQL.Scan(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "post.pg.query")
 	}
@@ -148,21 +215,27 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 	}
 
 	var tags []Tags
-	err = db.NewSelect().
-		Model(&tags).
-		Column("tag").
-		Where("? IN (?)", bun.Ident("post_id"), bun.In(postsId)).
-		Group("tag").
-		Scan(ctx)
+	if len(postsId) > 0 {
+		err = db.NewSelect().
+			Model(&tags).
+			Column("tag").
+			Where("? IN (?)", bun.Ident("post_id"), bun.In(postsId)).
+			Group("tag").
+			Order("tag ASC").
+			Scan(ctx)
+	}
 
 	tagStrings := make([]string, 0, len(tags))
 	for _, tag := range tags {
 		tagStrings = append(tagStrings, tag.Tag)
 	}
 
+	fmt.Println("result", postsModel)
 	result := make([]model.Post, 0, len(postsModel))
 	for idx := range postsModel {
-		result = append(result, *postsModel[idx].FromDB())
+		item := postsModel[idx].FromDB()
+		item.Tags = model.NewTags(db.getTags(item.PostID)...)
+		result = append(result, *item)
 	}
 
 	postlist := &model.PostList{

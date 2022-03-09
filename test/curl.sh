@@ -2,8 +2,15 @@
 
 
 test_upload_one() {
+  if [[ "$1" -eq "" ]]; then
+    UPLOAD_FILE="terminal.gif"
+  else
+    UPLOAD_FILE="$1"
+  fi
+
+
   RES="$(curl -s -X POST http://localhost:1314/api/posts \
-    -F "upload[]=@terminal.gif" \
+    -F "upload[]=@$UPLOAD_FILE" \
     -H "Content-Type: multipart/form-data")"
 
   if [[ "$(echo "$RES" | jq '. | length')" -ne "1" ]]; then

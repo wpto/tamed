@@ -51,6 +51,6 @@ func run() error {
 		api.DELETE("/posts/:id", postRoute.Delete)
 	}
 
-	router.Run(":1314")
+	router.Run(":" + config.Get().Port)
 	return nil
 }

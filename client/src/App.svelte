@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { query, modify } from './api.ts'
+	import {searchField, searchTags} from './search.ts'
 	import Post from './Post.svelte'
 	import Search from './Search.svelte'
 	import TagList from './TagList.svelte'
+	import Upload from './Upload.svelte'
+	import TagPool from './TagPool.svelte'
 	import InfiniteScroll from 'svelte-infinite-scroll'
 	export let name: string
 
@@ -15,16 +18,36 @@
 	let currPage = 0
 	let currLimit = 20
 
+	let tagPool = []
+
+	const mergeTagPools = (first, another: string[]): string[] => {
+		const map = {}
+		for (let i = 0; i < first.length; i++) {
+			map[first[i]] = true
+		}
+		for (let i = 0; i < another.length; i++) {
+			map[another[i]] = true
+		}
+		const list = Object.keys(map)
+		list.sort()
+		return list
+	}
+
 	const updateList = async (next = false) => {
-		const result = await query({ includeTags: incTags, excludeTags: excTags, offset: currPage, limit: currLimit})
-		console.log(result)
+		const result = await query({
+			includeTags: incTags,
+			excludeTags: excTags,
+			offset: currPage,
+			limit: currLimit,
+		})
 		if (next) {
 			posts = [...posts, ...result.posts]
+			tagPool = mergeTagPools(tagPool, result.tags)
 		} else {
 			posts = result.posts
+			tagPool = mergeTagPools([], result.tags)
 		}
 		hasNext = result.next
-		console.log(posts[0])
 		loaded = true
 	}
 
@@ -52,31 +75,35 @@
 		}
 	}
 
+	const onUpload = async () => {
+		if (incTags.length === 0 && excTags.length === 0 && currPage === 0) {
+			await updateList(false)
+		}
+	}
+
+	const onIncludeTag = async (tag: string) => {
+		if ($searchTags.include.indexOf(tag) === -1) {
+			$searchField = $searchField + " " +  tag
+		}
+	}
+
+	const onExcludeTag = async (tag: string) => {
+		if ($searchTags.exclude.indexOf(tag) === -1) {
+			$searchField = $searchField + " -" +  tag
+		}
+	}
+
 	onMount(updateList)
 </script>
 
 <main>
 	<div class="container">
-		<h1>Tamed - File server</h1>
+		<h1>Tamed - Image Fileserver</h1>
+		<div><a href="//github.com/pgeowng/tamed">Github</a></div>
 		<div class="row">
 			<div class="col-md-4">
 				<div class="bd-example">
-					<div class="mb-3">
-						<label for="uploadInput" class="form-label"
-							>Multiple file upload</label
-						>
-						<input
-							type="file"
-							class="form-control"
-							id="uploadInput"
-							multiple="multiple"
-						/>
-					</div>
-					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-						<button class="btn btn-primary me-md-2" id="uploadButton">
-							Upload
-						</button>
-					</div>
+					<Upload onUpload="{onUpload}" />
 				</div>
 				<div class="bd-example">
 					<Search
@@ -85,21 +112,34 @@
 						{onSearch}
 					/>
 				</div>
+				<div class="bd-example tag-pool">
+					<TagPool tags="{tagPool}" includeTag={onIncludeTag} excludeTag={onExcludeTag}/>
+				</div>
 			</div>
 			<div class="col-md-8">
 				<div class="bd-example">
-					{#if incTags.length === 0 && excTags.length === 0} Recent {:else}
-					<TagList includeTags="{incTags}" excludeTags="{excTags}" />
-					{/if}
+					Looking for: {#if incTags.length !== 0 || excTags.length !== 0}
+					<div class="searchTagList">
+						<TagList includeTags="{incTags}" excludeTags="{excTags}" />
+					</div>
+					{:else} All {/if}
 				</div>
 				<div class="post-list">
-					{#if loaded} {#each posts as post}
-					<div class="bd-example">
-						<Post link={"/media/"+post.link} id={post.id} date={post.ctime}
-						tags={post.tags} onAddTags={onAddTags} onRmTag={onRmTag}/>
-					</div>
-					{/each} {/if}
-					<InfiniteScroll on:loadMore={handleScrollLoad} window={true}/>
+					{#if loaded}
+						{#if posts.length === 0} 
+							It seems like there is no matching images
+						{:else }
+						{#each posts as post}
+						<div class="bd-example">
+							<Post link={"/media/"+post.link} id={post.id} date={post.ctime}
+							tags={post.tags} onAddTags={onAddTags} onRmTag={onRmTag}/>
+						</div>
+						{/each}
+					{/if}
+					{:else}
+						Loading...
+					{/if}
+					<InfiniteScroll on:loadMore="{handleScrollLoad}" window="{true}" />
 				</div>
 			</div>
 		</div>
@@ -114,22 +154,15 @@
 		border-radius: 0.25rem;
 	}
 
+	.tag-pool {
+		padding:  0;
+	}
+
 	.post-list {
 		margin-bottom: 20rem;
 	}
 
-	/*	main {
-		/*text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+	.searchTagList {
+		display: inline-block;
 	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-*/
 </style>

@@ -32,9 +32,7 @@ type PostQuery struct {
 }
 
 type PostList struct {
-	Page  int    `json:"page"`
-	Pages int    `json:"pages"`
-	Total int    `json:"total"`
+	Next  bool   `json:"next"`
 	Posts []Post `json:"posts"`
 	Tags  *Tags  `json:"tags"`
 }

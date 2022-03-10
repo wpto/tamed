@@ -200,8 +200,8 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 			Having("COUNT(?) = ?", bun.Ident("p.post_id"), query.IncludeTags.Len())
 	}
 
-	postSQL = postSQL.Offset(query.Offset).
-		Limit(query.Limit).
+	postSQL = postSQL.Offset(query.Offset * query.Limit).
+		Limit(query.Limit + 1).
 		Order("p.post_id DESC")
 
 	err := postSQL.Scan(ctx)
@@ -209,7 +209,16 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 		return nil, errors.Wrap(err, "post.pg.query")
 	}
 
-	postsId := make([]string, 0, len(postsModel))
+	hasNext := len(postsModel) == query.Limit+1
+	fmt.Println("query", len(postsModel))
+
+	length := len(postsModel)
+	if hasNext {
+		length = query.Limit
+		postsModel = postsModel[:length]
+	}
+
+	postsId := make([]string, 0, length)
 	for _, post := range postsModel {
 		postsId = append(postsId, post.PostID)
 	}
@@ -230,18 +239,16 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 		tagStrings = append(tagStrings, tag.Tag)
 	}
 
-	fmt.Println("result", postsModel)
-	result := make([]model.Post, 0, len(postsModel))
+	result := make([]model.Post, 0, length)
 	for idx := range postsModel {
 		item := postsModel[idx].FromDB()
 		item.Tags = model.NewTags(db.getTags(item.PostID)...)
 		result = append(result, *item)
 	}
+	fmt.Println("result", len(result))
 
 	postlist := &model.PostList{
-		Page:  0,
-		Pages: 1,
-		Total: 20,
+		Next:  hasNext,
 		Posts: result,
 		Tags:  model.NewTags(tagStrings...),
 	}

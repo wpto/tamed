@@ -2,7 +2,6 @@ package localfs
 
 import (
 	"encoding/json"
-	"math"
 
 	"github.com/pgeowng/tamed/model"
 	"github.com/pkg/errors"
@@ -40,9 +39,7 @@ func (store *PostStore) Query(query *model.PostQuery) (*model.PostList, error) {
 		}
 
 		return &model.PostList{
-			Page:  1,
-			Pages: 1,
-			Total: 1,
+			Next:  false,
 			Posts: []model.Post{*post},
 			Tags:  post.Tags,
 		}, nil
@@ -69,24 +66,24 @@ func (store *PostStore) Query(query *model.PostQuery) (*model.PostList, error) {
 	}
 
 	total := len(filtered)
-	pages := int(math.Ceil(float64(total) / float64(query.Limit)))
+	//pages := int(math.Ceil(float64(total) / float64(query.Limit)))
 
 	left := query.Offset * query.Limit
-	page := int(math.Floor(float64(left) / float64(query.Limit)))
+	//page := int(math.Floor(float64(left) / float64(query.Limit)))
 	if left >= total {
 		left = total
-		page = pages
+		//page = pages
 	}
 
+	hasNext := true
 	right := left + query.Limit
 	if right > total {
 		right = total
+		hasNext = false
 	}
 
 	return &model.PostList{
-		Page:  page,
-		Pages: pages,
-		Total: total,
+		Next:  hasNext,
 		Posts: filtered[left:right],
 		Tags:  model.NewTags(),
 	}, nil

@@ -2,6 +2,8 @@
 interface queryOpts {
   includeTags: string[]
   excludeTags: string[]
+  offset: number,
+  limit: number,
 }
 
 interface postResult {
@@ -14,14 +16,18 @@ interface postResult {
 interface queryResult {
   posts: postResult[]
   tags: string[]
+  next: boolean
 }
 
-export const query = async ({includeTags, excludeTags}:queryOpts ) => {
+export const query = async ({includeTags, excludeTags, offset = 0, limit = 20}:queryOpts ) => {
     const q : string[] = []
     if (includeTags.length > 0 || excludeTags.length > 0)  {
       const val = [].concat(...includeTags, ...(excludeTags.map(e => "-"+e))).join(' ')
       q.push("tags="+val)
     }
+
+    q.push("offset=" + offset)
+    q.push("limit=" + limit)
 
     let append = ''
     if (q.length > 0) {

@@ -5,6 +5,7 @@
   export let tags = ["there", "hello", "world"]
   export let onAddTags = () => {}
   export let onRmTag = () => {}
+  export let onDelete = () => {}
 
   let addTagField=''
 
@@ -24,6 +25,10 @@
     return () => {
       onRmTag(id, tag)
     }
+  }
+
+  const handleDelete = () => {
+    onDelete(id)
   }
 
   let d = ""
@@ -51,5 +56,8 @@
       <button class="btn btn-sm btn-primary me-md-2" on:click={handleAddTag}>Add Tags</button>
     </div>
     <input type="text" class="form-control form-control-sm" bind:value={addTagField}/>
+  </div>
+  <div>
+      <button class="btn btn-sm btn-danger me-md-2" on:click={handleDelete}>Delete</button>
   </div>
 </div>

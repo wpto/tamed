@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { query, modify } from './api.ts'
+	import { query, modify, remove } from './api.ts'
 	import {searchField, searchTags} from './search.ts'
 	import Post from './Post.svelte'
 	import Search from './Search.svelte'
@@ -93,6 +93,11 @@
 		}
 	}
 
+	const onDelete = async (id: string) => {
+		await remove(id)
+		posts = posts.filter(p => p.id != id)
+	}
+
 	onMount(updateList)
 </script>
 
@@ -132,7 +137,7 @@
 						{#each posts as post}
 						<div class="bd-example">
 							<Post link={"/media/"+post.link} id={post.id} date={post.ctime}
-							tags={post.tags} onAddTags={onAddTags} onRmTag={onRmTag}/>
+							tags={post.tags} onAddTags={onAddTags} onRmTag={onRmTag} onDelete={onDelete}/>
 						</div>
 						{/each}
 					{/if}

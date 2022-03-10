@@ -58,3 +58,32 @@ export const modify = async (postId:string, includeTags: string[], excludeTags: 
   if (json.ok == "changed") return true
   return false
 }
+
+export const remove = async (postId: string) => {
+  const res = await fetch('/api/posts/'+postId, {
+    method: 'DELETE',
+  })
+  const json = await res.json()
+  console.log(json)
+}
+
+export const upload = async(files) => {
+      const data = new FormData()
+      const count = files.length
+
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i]
+        data.append('upload[]', f)
+      }
+
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          body: data,
+        })
+        const response = await res.json()
+        return response
+      } catch (e) {
+        return [{error: ''+e}]
+      }
+}

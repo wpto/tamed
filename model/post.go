@@ -7,6 +7,16 @@ type Post struct {
 	Link       string `json:"link"`
 }
 
+type PostCreate struct {
+	PostID     string `json:"id,omitempty"`
+	CreateTime string `json:"ctime,omitempty"`
+	Tags       *Tags  `json:"tags,omitempty"`
+	Link       string `json:"link,omitempty"`
+
+	Success bool   `json:"success"`
+	Error   string `json:"error,omitempty"`
+}
+
 type PostChanges struct {
 	AddTags    *Tags
 	RemoveTags *Tags

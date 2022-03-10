@@ -54,3 +54,12 @@ func WriteMedia(localPath string, upload io.Reader) error {
 
 	return nil
 }
+
+func (repo *MediaRepo) Delete(mediaID string) error {
+	dirPath := filepath.Join(repo.localPath, mediaID)
+	err := os.RemoveAll(dirPath)
+	if err != nil {
+		return errors.Wrap(err, "mediarepo.delete")
+	}
+	return nil
+}

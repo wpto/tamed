@@ -17,12 +17,9 @@ type FileRepo interface {
 	All() ([]byte, error)
 }
 
-type MediaRepo interface {
-	UploadReader(mediaID, ext string, upload io.Reader) (filePath string, err error)
-}
-
 type MediaStore interface {
 	Upload(mediaID string, ext string, upload io.Reader) (filePath string, err error)
+	Delete(mediaID string) error
 }
 
 type PostStore interface {

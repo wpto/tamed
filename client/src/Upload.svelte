@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { upload } from './api.ts'
   export let onUpload = () => {}
 
   let uploadInput = null
 
-  let uploadMsg = ''
+  let uploadMsg = []
   let showUploadMsg = false
   let timerID = 0
-  let timerDuration = 3000
-  const setMessage = (msg: string) => {
+  let timerDuration = 20000
+  const setMessage = (msg: string[]) => {
     clearTimeout(timerID)
     uploadMsg = msg
     showUploadMsg = true
@@ -22,27 +23,23 @@
       uploadInput.files != null &&
       uploadInput.files.length !== 0
     ) {
-      console.log(uploadInput.files)
-      const files = uploadInput.files
-      const data = new FormData()
-      const count = files.length
-
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i]
-        data.append('upload[]', f)
+      const result = await upload(uploadInput.files)
+      const errors = []
+      for (let i = 0; i < result.length; i++) {
+        const item = result[i]
+        if (item.error != null) {
+          errors.push(item.error)
+        }
       }
 
-      try {
-        const res = await fetch('/api/posts', {
-          method: 'POST',
-          body: data,
-        })
-        const response = await res.json()
-        setMessage(`Successfully uploaded ${count} ${count === 1 ? 'file':'files'}`)
-        onUpload()
-      } catch (e) {
-        setMessage(`Error when uploading: ${e}`)
+      if (errors.length > 0) {
+        setMessage(errors)
+      } else {
+        setMessage([
+          `Successfully uploaded ${count} ${count === 1 ? 'file' : 'files'}`,
+        ])
       }
+      onUpload()
     }
   }
 </script>
@@ -69,8 +66,7 @@
     </button>
   </div>
   <div>
-    {#if showUploadMsg}
-      {uploadMsg}
-    {/if}
+    {#if showUploadMsg} {#each uploadMsg as msg} {msg}<br /><br/>
+    {/each } {/if}
   </div>
 </div>

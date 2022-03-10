@@ -14,7 +14,7 @@ type PostService interface {
 	List(query *model.PostQuery) (*model.PostList, error)
 	Modify(postID string, changes *model.PostChanges) error
 	Delete(postID string) error
-	Create(files []*multipart.FileHeader) ([]model.Post, error)
+	Create(files []*multipart.FileHeader) ([]model.PostCreate, error)
 }
 
 type Manager struct {

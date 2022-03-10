@@ -19,3 +19,7 @@ func (st *MediaStore) Upload(mediaID string, ext string, upload io.Reader) (stri
 	filePath, err := st.repo.UploadReader(mediaID, ext, upload)
 	return filePath, err
 }
+
+func (st *MediaStore) Delete(mediaID string) error {
+	return st.repo.Delete(mediaID)
+}

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+git branch -D testbranch
 git checkout -b testbranch
 npm run build --prefix client
 git add client/public/build -f

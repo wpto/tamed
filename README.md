@@ -1,25 +1,17 @@
-# tamed
+# Tamed - Image Fileserver
 
-Imageboard engine
+## features
 
-## implemented
-
-```
-restapi /api
-  GET /posts
-  GET /posts/:id
-  POST /posts
-  PATCH /posts/:id
-  DELETE /posts/:id
-
-load media /media/:id
-```
+- PostgreSQL post store using [uptrace/bun](https://github.com/uptrace/bun)
+- REST api using [gin-gonic/gin](https://github.com/gin-gonic/gin)
+- Web client using [svelte](https://github.com/sveltejs/svelte)
+- Deployed to heroku [https://pgeowng-tamed.herokuapp.com/](https://pgeowng-tamed.herokuapp.com/)
 
 ## todo
 
-```
-+ sql store
-+ web client
-+ upload vid
-+ preview output for img/vid
-```
+- Uploading video/audio formats
+- Generating preview media
+
+## quick preview
+
+![proof of work](./docs/v1.gif)

@@ -33,19 +33,19 @@ func Dial() (*DB, error) {
 	if config.Get().PgReset {
 		ctx := context.Background()
 
-		_, err := db.NewDropTable().Model((*Tags)(nil)).Exec(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "post.pg.drop")
-		}
+		db.NewDropTable().Model((*Tags)(nil)).Exec(ctx)
+		// if err != nil {
+		// 	return nil, errors.Wrap(err, "post.pg.drop")
+		// }
 
 		ctx = context.Background()
-		_, err = db.NewDropTable().Model((*Post)(nil)).Exec(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "post.pg.drop")
-		}
+		db.NewDropTable().Model((*Post)(nil)).Exec(ctx)
+		// if err != nil {
+		// 	return nil, errors.Wrap(err, "post.pg.drop")
+		// }
 
 		ctx = context.Background()
-		_, err = db.NewCreateTable().Model((*Post)(nil)).Exec(ctx)
+		_, err := db.NewCreateTable().Model((*Post)(nil)).Exec(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "post.pg.create")
 		}

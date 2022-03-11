@@ -44,4 +44,9 @@ export const searchTags = derived(searchField, ($searchField) => {
     return result
   }
 
+export const rmTag = (field, tag, newTag ="") => {
+    const re = new RegExp(`( |^)${tag}( |$)`)
+    return field.replace(re, `$1${newTag}$2`)
+}
+
 

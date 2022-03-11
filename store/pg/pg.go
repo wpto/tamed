@@ -200,9 +200,9 @@ func (db *DB) Query(query *model.PostQuery) (*model.PostList, error) {
 			Having("COUNT(?) = ?", bun.Ident("p.post_id"), query.IncludeTags.Len())
 	}
 
-	postSQL = postSQL.Offset(query.Offset * query.Limit).
-		Limit(query.Limit + 1).
-		Order("p.post_id DESC")
+	postSQL = postSQL.Offset(query.Offset*query.Limit).
+		Limit(query.Limit+1).
+		Order("p.create_time DESC", "p.post_id DESC")
 
 	err := postSQL.Scan(ctx)
 	if err != nil {

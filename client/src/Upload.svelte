@@ -26,20 +26,23 @@
       const result = await upload(uploadInput.files)
       const count = uploadInput.files.length
       const errors = []
+      let successCount = 0
       for (let i = 0; i < result.length; i++) {
         const item = result[i]
         if (item.error != null) {
+          const match = item.error.match(/\(([^)]*)\).*bad upload type/)
+          if (match != null) {
+            errors.push(`Bad upload type: ${match[1]}`)
+          } else {
+
           errors.push(item.error)
+        }
+        } else {
+          successCount++
         }
       }
 
-      if (errors.length > 0) {
-        setMessage(errors)
-      } else {
-        setMessage([
-          `Successfully uploaded ${count} ${count === 1 ? 'file' : 'files'}`,
-        ])
-      }
+      setMessage([...errors,`Successfully uploaded ${successCount} ${successCount === 1 ? 'file' : 'files'}` ])
       onUpload()
     }
   }
@@ -57,7 +60,7 @@
       bind:this="{uploadInput}"
     />
   </div>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
     <button
       class="btn btn-primary me-md-2"
       id="uploadButton"
@@ -67,7 +70,13 @@
     </button>
   </div>
   <div>
-    {#if showUploadMsg} {#each uploadMsg as msg} {msg}<br /><br />
+    {#if showUploadMsg} {#each uploadMsg as msg}<div class="msg">{msg}</div>
     {/each } {/if}
   </div>
 </div>
+
+<style>
+  .msg:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+</style>

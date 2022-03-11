@@ -1,6 +1,6 @@
 <script lang="ts">
   import TagList from './TagList.svelte'
-  import { searchField, searchTags } from './search.ts'
+  import { searchField, searchTags, rmTag } from './search.ts'
   export let onSearch = () => {}
 
   const handleSearchButton = () => {
@@ -8,8 +8,8 @@
   }
 
   const handleRemoveTag = (tag) => {
-    const re = new RegExp(`(?: |^)${tag}(?: |$)`)
-    $searchField = $searchField.replace(re, " ")
+    const field = $searchField
+    $searchField = rmTag(field, tag)
   }
 </script>
 

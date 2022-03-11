@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { query, modify, remove } from './api.ts'
-	import {searchField, searchTags} from './search.ts'
+	import {searchField, searchTags, rmTag} from './search.ts'
 	import Post from './Post.svelte'
 	import Search from './Search.svelte'
 	import TagList from './TagList.svelte'
@@ -40,10 +40,8 @@
 			offset: currPage,
 			limit: currLimit,
 		})
-		console.log(result)
 		for (let i = 0; i < result.posts.length; i++) {
 			result.posts[i].tags.sort()
-			console.log(result.posts[i].tags)
 		}
 		if (next) {
 			posts = [...posts, ...result.posts]
@@ -88,13 +86,23 @@
 
 	const onIncludeTag = async (tag: string) => {
 		if ($searchTags.include.indexOf(tag) === -1) {
-			$searchField = $searchField + " " +  tag
+			if ($searchTags.exclude.indexOf(tag) !== -1)
+				$searchField = rmTag($searchField, "-"+tag, tag)
+			else 
+				$searchField = ($searchField.trim() + " " +  tag).trim()
+		} else {
+			$searchField = rmTag($searchField, "-"+tag)
 		}
 	}
 
 	const onExcludeTag = async (tag: string) => {
 		if ($searchTags.exclude.indexOf(tag) === -1) {
-			$searchField = $searchField + " -" +  tag
+			if ($searchTags.include.indexOf(tag) !== -1)
+				$searchField = rmTag($searchField, tag, "-"+tag)
+			else
+				$searchField = ($searchField.trim() + " -" +  tag).trim()
+		} else {
+			$searchField = rmTag($searchField, tag)
 		}
 	}
 

@@ -13,8 +13,7 @@ type PostCreate struct {
 	Tags       *Tags  `json:"tags,omitempty"`
 	Link       string `json:"link,omitempty"`
 
-	Success bool   `json:"success"`
-	Error   string `json:"error,omitempty"`
+	Error string `json:"error,omitempty"`
 }
 
 type PostChanges struct {

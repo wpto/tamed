@@ -16,7 +16,7 @@
       for (let i = 0; i < tokens.length; i++) {
         map[tokens[i]] = true
       }
-
+      addTagField = ""
       onAddTags(id, Object.keys(map))
     }
   }

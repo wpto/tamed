@@ -40,6 +40,11 @@
 			offset: currPage,
 			limit: currLimit,
 		})
+		console.log(result)
+		for (let i = 0; i < result.posts.length; i++) {
+			result.posts[i].tags.sort()
+			console.log(result.posts[i].tags)
+		}
 		if (next) {
 			posts = [...posts, ...result.posts]
 			tagPool = mergeTagPools(tagPool, result.tags)

@@ -1,10 +1,15 @@
 <script lang="ts">
   import TagList from './TagList.svelte'
-  import {searchField, searchTags} from './search.ts'
+  import { searchField, searchTags } from './search.ts'
   export let onSearch = () => {}
 
   const handleSearchButton = () => {
     onSearch($searchTags.include, $searchTags.exclude)
+  }
+
+  const handleRemoveTag = (tag) => {
+    const re = new RegExp(`(?: |^)${tag}(?: |$)`)
+    $searchField = $searchField.replace(re, " ")
   }
 </script>
 
@@ -28,5 +33,11 @@
       Search
     </button>
   </div>
-  <div><TagList includeTags={$searchTags.include} excludeTags={$searchTags.exclude} /></div>
+  <div>
+    <TagList
+      includeTags="{$searchTags.include}"
+      excludeTags="{$searchTags.exclude}"
+      onClick="{handleRemoveTag}"
+    />
+  </div>
 </div>

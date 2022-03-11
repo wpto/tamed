@@ -24,6 +24,7 @@
       uploadInput.files.length !== 0
     ) {
       const result = await upload(uploadInput.files)
+      const count = uploadInput.files.length
       const errors = []
       for (let i = 0; i < result.length; i++) {
         const item = result[i]
@@ -66,7 +67,7 @@
     </button>
   </div>
   <div>
-    {#if showUploadMsg} {#each uploadMsg as msg} {msg}<br /><br/>
+    {#if showUploadMsg} {#each uploadMsg as msg} {msg}<br /><br />
     {/each } {/if}
   </div>
 </div>

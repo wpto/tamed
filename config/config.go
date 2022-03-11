@@ -14,7 +14,7 @@ type Config struct {
 	FsMediaPath  string `envconfig:"FS_MEDIA_PATH"`
 	FsPostDBPath string `envconfig:"FS_POSTDB_PATH"`
 
-	PgUrl   string `envconfig:"PG_URL"`
+	PgUrl   string `envconfig:"DATABASE_URL"`
 	PgReset bool   `envconfig:"PG_RESET"`
 	Port    string `envconfig:"PORT"`
 }
